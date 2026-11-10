@@ -111,6 +111,49 @@ async function sendConfirmationEmail(b) {
   return { ok: res.ok };
 }
 
+
+// ---- Team notifications: Google Sheet row + internal email (both optional) ----
+async function appendToSheet(b) {
+  if (!process.env.SHEET_WEBHOOK_URL) return;
+  const res = await fetch(process.env.SHEET_WEBHOOK_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify({
+      secret: process.env.SHEET_SECRET || '',
+      row: [
+        new Date(b.confirmed_at || Date.now()).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }),
+        b.name, b.phone, b.email, b.trek_name, b.sharing, b.travellers,
+        b.travel_date || '', b.total_amount, b.advance_paid, b.balance_due,
+        b.razorpay_payment_id, b.razorpay_order_id, b.status,
+      ],
+    }),
+  });
+  if (!res.ok) console.error('Sheet webhook error', res.status);
+}
+
+async function notifyTeam(b) {
+  if (!process.env.RESEND_API_KEY || !process.env.TEAM_EMAIL) return;
+  const from = process.env.EMAIL_FROM || 'Trip Trek India <bookings@triptrekindia.in>';
+  const html = `<div style="font-family:Arial,sans-serif;font-size:14px;color:#13243C">
+    <h3 style="color:#043C87">New booking — ${esc(b.trek_name)}</h3>
+    <p><b>${esc(b.name)}</b> · ${esc(b.phone)} · ${esc(b.email)}</p>
+    <p>${esc(b.travellers)} traveller(s), ${esc(b.sharing)} sharing<br>
+    Preferred date: ${esc(b.travel_date || 'not given')}<br>
+    Total ${inr(b.total_amount)} · Advance paid <b>${inr(b.advance_paid)}</b> · Balance ${inr(b.balance_due)}<br>
+    Payment ID: ${esc(b.razorpay_payment_id)}</p></div>`;
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + env('RESEND_API_KEY'), 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from, to: process.env.TEAM_EMAIL.split(',').map((x) => x.trim()),
+      reply_to: b.email,
+      subject: 'New booking: ' + b.name + ' — ' + b.trek_name + ' (' + inr(b.advance_paid) + ' paid)',
+      html,
+    }),
+  });
+  if (!res.ok) console.error('Team email error', res.status, await res.text());
+}
+
 // Mark a booking paid (idempotent). Used by verify-payment AND the webhook.
 async function confirmBooking(orderId, paymentId) {
   const rows = await sb('bookings?razorpay_order_id=eq.' + encodeURIComponent(orderId) + '&select=*');
@@ -136,7 +179,10 @@ async function confirmBooking(orderId, paymentId) {
     return { booking: again[0], alreadyConfirmed: true };
   }
   b = updated[0];
-  await sendConfirmationEmail(b);
+  // Each step is isolated: a failure in one never blocks the booking or the others.
+  for (const step of [sendConfirmationEmail, appendToSheet, notifyTeam]) {
+    try { await step(b); } catch (e) { console.error(step.name + ' failed', e); }
+  }
   return { booking: b, alreadyConfirmed: false };
 }
 
