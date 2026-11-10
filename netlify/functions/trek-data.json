@@ -1,0 +1,71 @@
+{
+ "prices": {
+  "chakrata": {
+   "quad": 4999,
+   "triple": 5499,
+   "double": 5999
+  },
+  "chitkul-kalpa": {
+   "quad": 9999,
+   "double": 11999
+  },
+  "chopta-tungnath-chandrashila": {
+   "quad": 4999,
+   "triple": 5499,
+   "double": 5999
+  },
+  "jibhi-tirthan-valley": {
+   "quad": 5999,
+   "triple": 6499,
+   "double": 6999
+  },
+  "kanatal-tehri": {
+   "quad": 4999,
+   "triple": 5499,
+   "double": 5999
+  },
+  "kedarnath-yatra": {
+   "quad": 8999,
+   "triple": 9499,
+   "double": 9999
+  },
+  "madhyamaheshwar": {
+   "quad": 5999,
+   "triple": 6499,
+   "double": 6999
+  },
+  "manali-kasol": {
+   "quad": 4999,
+   "triple": 5499,
+   "double": 5999
+  },
+  "mcleodganj-triund": {
+   "quad": 6999,
+   "triple": 7499,
+   "double": 7999
+  },
+  "rudranath": {
+   "quad": 4999,
+   "triple": 5499,
+   "double": 5999
+  },
+  "yulla-kanda": {
+   "quad": 6999,
+   "double": 7999,
+   "solo": 8999
+  }
+ },
+ "names": {
+  "chakrata": "Chakrata Weekend Getaway — Tiger Falls & Moila Top",
+  "chitkul-kalpa": "Chitkul – Kalpa Trip",
+  "chopta-tungnath-chandrashila": "Chopta – Tungnath – Chandrashila Trek",
+  "jibhi-tirthan-valley": "Jibhi Tirthan Valley — Mini Thailand of India",
+  "kanatal-tehri": "Kanatal – Tehri Lake Trip",
+  "kedarnath-yatra": "Kedarnath Yatra — Jyotirlinga Pilgrimage",
+  "madhyamaheshwar": "Madhyamaheshwar Trek — Second Kedar",
+  "manali-kasol": "Manali – Kasol Trip",
+  "mcleodganj-triund": "McLeodganj – Triund Trek",
+  "rudranath": "Rudranath Trek — Panch Kedar Pilgrimage",
+  "yulla-kanda": "Yulla Kanda Trek — World's Highest Krishna Temple"
+ }
+}

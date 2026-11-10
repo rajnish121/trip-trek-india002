@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Account | Trip Trek India</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--navy:#043C87;--blue:#2A6BC5;--orange:#EF3006;--ink:#13243C;--grey:#5A6B80;--line:#E3E8EF;--green:#1E8E5A;--bg:#F4F7FB;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Poppins,Arial,sans-serif;color:var(--ink);background:var(--bg);}
+  header{background:#fff;border-bottom:1px solid var(--line);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+  header img{height:44px}
+  header a{color:var(--navy);text-decoration:none;font-weight:600;font-size:14px}
+  main{max-width:760px;margin:32px auto;padding:0 16px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px;box-shadow:0 4px 18px rgba(4,60,135,.06)}
+  h1{font-size:24px;margin:0 0 4px;color:var(--navy)} .sub{color:var(--grey);font-size:14px;margin:0 0 20px}
+  .tabs{display:flex;gap:8px;margin-bottom:18px}
+  .tabs button{flex:1;padding:10px;border:1px solid var(--line);background:#fff;border-radius:10px;font:600 14px Poppins;cursor:pointer;color:var(--grey)}
+  .tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  label{display:block;font-size:13px;font-weight:600;margin:12px 0 6px}
+  input{width:100%;padding:12px;border:1px solid #cfd8e6;border-radius:10px;font:400 15px Poppins}
+  input:focus{outline:2px solid var(--blue);border-color:var(--blue)}
+  .btn{display:block;width:100%;margin-top:18px;padding:13px;border:0;border-radius:10px;background:var(--orange);color:#fff;font:600 15px Poppins;cursor:pointer}
+  .btn[disabled]{opacity:.6;cursor:wait}
+  .link{background:none;border:0;color:var(--blue);font:600 13px Poppins;cursor:pointer;margin-top:12px;padding:0}
+  .msg{margin-top:14px;font-size:14px;padding:10px 12px;border-radius:8px;display:none}
+  .msg.err{display:block;background:#FDECEA;color:#B42318}
+  .msg.ok{display:block;background:#E8F6EF;color:var(--green)}
+  .hidden{display:none}
+  .otp{letter-spacing:8px;font-size:22px;text-align:center}
+  .banner{background:#E8F6EF;border:1px solid #bfe6d1;color:#14663f;border-radius:12px;padding:14px 16px;margin-bottom:18px;font-size:14px}
+  .profile{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0 24px}
+  .profile div{background:var(--bg);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--grey)}
+  .profile b{display:block;color:var(--ink);font-size:14px;word-break:break-all}
+  h2{font-size:18px;margin:8px 0 12px}
+  .bk{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
+  .bk .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+  .bk h3{margin:0;font-size:16px;color:var(--navy)}
+  .badge{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px}
+  .badge.confirmed{background:#E8F6EF;color:var(--green)} .badge.pending{background:#FFF4E0;color:#B26A00}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 16px;margin-top:12px;font-size:13px;color:var(--grey)}
+  .grid b{color:var(--ink);display:block;font-size:14px}
+  .empty{color:var(--grey);font-size:14px}
+  @media(max-width:520px){.profile{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><a href="../index.html"><img src="../assets/logo.png" alt="Trip Trek India"></a><a href="../index.html">← Back to site</a></header>
+<main>
+  <!-- LOGGED OUT -->
+  <div class="card" id="authCard">
+    <h1>My Account</h1>
+    <p class="sub">Create an account or log in to see your bookings.</p>
+    <div class="tabs"><button id="tabSignup" class="on" type="button">Create account</button><button id="tabLogin" type="button">Log in</button></div>
+
+    <div id="stepDetails">
+      <div id="signupOnly">
+        <label for="name">Full name</label><input id="name" autocomplete="name" placeholder="Your name">
+        <label for="phone">Mobile number</label><input id="phone" type="tel" autocomplete="tel" placeholder="10-digit mobile number">
+      </div>
+      <label for="email">Email</label><input id="email" type="email" autocomplete="email" placeholder="you@email.com">
+      <button class="btn" id="sendBtn" type="button">Send verification code</button>
+    </div>
+
+    <div id="stepOtp" class="hidden">
+      <p class="sub" style="margin-top:0">We emailed a code to <b id="sentTo"></b>. Enter it below.</p>
+      <label for="otp">Verification code</label><input id="otp" class="otp" inputmode="numeric" maxlength="8" autocomplete="one-time-code" placeholder="••••••">
+      <button class="btn" id="verifyBtn" type="button">Verify &amp; continue</button>
+      <button class="link" id="backBtn" type="button">Use a different email</button>
+    </div>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <!-- LOGGED IN -->
+  <div class="card hidden" id="dash">
+    <div class="banner hidden" id="createdBanner">✅ Account created and verified with <b id="bEmail"></b><span id="bPhone"></span></div>
+    <h1 id="hello">Welcome</h1>
+    <p class="sub">Your account details and bookings.</p>
+    <div class="profile">
+      <div>Email<b id="pEmail"></b></div>
+      <div>Mobile<b id="pPhone">—</b></div>
+    </div>
+    <h2>My bookings</h2>
+    <div id="bookings"><p class="empty">Loading…</p></div>
+    <button class="link" id="logout" type="button">Log out</button>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+(async function(){
+  var $ = function(id){return document.getElementById(id)};
+  var mode = 'signup', sb, justCreated = false;
+  var inr = function(n){return '₹' + Number(n||0).toLocaleString('en-IN')};
+  var esc = function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+
+  function say(t, kind){ var m=$('msg'); m.className='msg '+(kind||'err'); m.textContent=t; if(!t) m.className='msg'; }
+
+  try {
+    var cfg = await (await fetch('/.netlify/functions/public-config')).json();
+    sb = supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey);
+  } catch(e){ say('Login is temporarily unavailable. Please try again shortly.'); return; }
+
+  function setMode(m){
+    mode = m;
+    $('tabSignup').classList.toggle('on', m==='signup');
+    $('tabLogin').classList.toggle('on', m==='login');
+    $('signupOnly').classList.toggle('hidden', m!=='signup');
+    $('sendBtn').textContent = m==='signup' ? 'Send verification code' : 'Send login code';
+    say('');
+  }
+  $('tabSignup').onclick = function(){ setMode('signup') };
+  $('tabLogin').onclick = function(){ setMode('login') };
+  $('backBtn').onclick = function(){ $('stepOtp').classList.add('hidden'); $('stepDetails').classList.remove('hidden'); say(''); };
+
+  $('sendBtn').onclick = async function(){
+    var email = $('email').value.trim().toLowerCase();
+    var name = $('name').value.trim();
+    var phone = $('phone').value.replace(/\s|\+91/g,'');
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return say('Please enter a valid email.');
+    if(mode==='signup'){
+      if(name.length<2) return say('Please enter your name.');
+      if(!/^[6-9]\d{9}$/.test(phone)) return say('Please enter a valid 10-digit mobile number.');
+    }
+    this.disabled = true;
+    var opts = { shouldCreateUser: true };
+    if(mode==='signup') opts.data = { full_name: name, phone: phone };
+    var r = await sb.auth.signInWithOtp({ email: email, options: opts });
+    this.disabled = false;
+    if(r.error){ console.error('OTP error', r.error); var m=(r.error.message||'').toLowerCase();
+      return say(m.indexOf('rate')>-1 || r.error.status===429 ? 'Too many attempts. Please wait a few minutes and try again.' : 'Could not send the code (' + (r.error.message||'unknown error') + '). Please try again or contact us.'); }
+    justCreated = (mode==='signup');
+    $('sentTo').textContent = email;
+    $('stepDetails').classList.add('hidden'); $('stepOtp').classList.remove('hidden');
+    say('Code sent. Check your inbox (and spam folder).','ok');
+  };
+
+  $('verifyBtn').onclick = async function(){
+    var email = $('sentTo').textContent, token = $('otp').value.trim();
+    if(token.length<6) return say('Enter the code from your email.');
+    this.disabled = true;
+    var r = await sb.auth.verifyOtp({ email: email, token: token, type: 'email' });
+    this.disabled = false;
+    if(r.error) return say('That code is incorrect or has expired.');
+    say(''); showDash(r.data.user, true);
+  };
+
+  $('logout').onclick = async function(){ await sb.auth.signOut(); location.reload(); };
+
+  async function showDash(user, fresh){
+    $('authCard').classList.add('hidden'); $('dash').classList.remove('hidden');
+    var md = user.user_metadata || {};
+    var email = user.email;
+    $('hello').textContent = 'Hello' + (md.full_name ? ', ' + md.full_name.split(' ')[0] : '') + ' 👋';
+    $('pEmail').textContent = email;
+
+    var bk = await sb.from('bookings').select('*').order('created_at',{ascending:false});
+    var rows = (bk.data||[]).filter(function(b){return b.status==='confirmed' || b.status==='pending'});
+    var phone = md.phone || (rows[0] && rows[0].phone) || '';
+    $('pPhone').textContent = phone ? '+91 ' + phone : '—';
+    if(fresh && justCreated){
+      $('createdBanner').classList.remove('hidden');
+      $('bEmail').textContent = email;
+      $('bPhone').textContent = phone ? ' and mobile +91 ' + phone : '';
+    }
+    var box = $('bookings');
+    var shown = rows.filter(function(b){return b.status==='confirmed'});
+    var pend = rows.filter(function(b){return b.status==='pending'});
+    if(!shown.length && !pend.length){ box.innerHTML = '<p class="empty">No bookings yet. Pick a trip and reserve your seat — it will show up here.</p>'; return; }
+    box.innerHTML = shown.concat(pend).map(function(b){
+      var ok = b.status==='confirmed';
+      return '<div class="bk"><div class="top"><h3>'+esc(b.trek_name||b.trek)+'</h3>'
+        + '<span class="badge '+(ok?'confirmed':'pending')+'">'+(ok?'Booking Confirmed':'Payment pending')+'</span></div>'
+        + '<div class="grid">'
+        + '<div>Travellers<b>'+esc(b.travellers)+' ('+esc(b.sharing)+' sharing)</b></div>'
+        + '<div>Preferred date<b>'+esc(b.travel_date||'To be confirmed')+'</b></div>'
+        + '<div>Advance paid<b>'+inr(b.advance_paid)+'</b></div>'
+        + '<div>Balance due at onboarding<b>'+inr(b.balance_due)+'</b></div>'
+        + '<div>Total<b>'+inr(b.total_amount)+'</b></div>'
+        + '<div>Payment ID<b>'+esc(b.razorpay_payment_id||'—')+'</b></div>'
+        + '</div></div>';
+    }).join('');
+  }
+
+  var s = await sb.auth.getSession();
+  if(s.data.session) showDash(s.data.session.user, false);
+})();
+</script>
+</body>
+</html>
