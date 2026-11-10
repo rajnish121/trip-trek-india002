@@ -130,7 +130,8 @@
     if(mode==='signup') opts.data = { full_name: name, phone: phone };
     var r = await sb.auth.signInWithOtp({ email: email, options: opts });
     this.disabled = false;
-    if(r.error) return say(r.error.message.indexOf('rate')>-1 ? 'Too many attempts. Please wait a minute and try again.' : 'Could not send the code. Please try again.');
+    if(r.error){ console.error('OTP error', r.error); var m=(r.error.message||'').toLowerCase();
+      return say(m.indexOf('rate')>-1 || r.error.status===429 ? 'Too many attempts. Please wait a few minutes and try again.' : 'Could not send the code (' + (r.error.message||'unknown error') + '). Please try again or contact us.'); }
     justCreated = (mode==='signup');
     $('sentTo').textContent = email;
     $('stepDetails').classList.add('hidden'); $('stepOtp').classList.remove('hidden');
