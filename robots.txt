@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /account/
+Disallow: /.netlify/functions/
+
+Sitemap: https://triptrekindia.in/sitemap.xml
