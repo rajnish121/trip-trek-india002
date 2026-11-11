@@ -53,6 +53,10 @@
    "quad": 6999,
    "double": 7999,
    "solo": 8999
+  },
+  "udaipur-mount-abu": {
+   "quad": 6999,
+   "double": 7999
   }
  },
  "names": {
@@ -66,7 +70,8 @@
   "manali-kasol": "Manali – Kasol Trip",
   "mcleodganj-triund": "McLeodganj – Triund Trek",
   "rudranath": "Rudranath Trek — Panch Kedar Pilgrimage",
-  "yulla-kanda": "Yulla Kanda Trek — World's Highest Krishna Temple"
+  "yulla-kanda": "Yulla Kanda Trek — World's Highest Krishna Temple",
+  "udaipur-mount-abu": "Udaipur with Mount Abu Trip"
  },
  "closed": {
   "yulla-kanda": "Opens April 2027",
