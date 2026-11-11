@@ -12,6 +12,9 @@ exports.handler = async (event) => {
     const phone = String(p.phone || '').replace(/\s|\+91|^0/g, '');
     const travelDate = p.date ? String(p.date).slice(0, 10) : null;
 
+    if (DATA.closed && DATA.closed[trek]) {
+      return json(400, { error: 'Bookings for this trip are closed right now (' + DATA.closed[trek] + '). Please message us on WhatsApp to be notified.' });
+    }
     const pricePer = DATA.prices[trek] && DATA.prices[trek][sharing];
     if (!pricePer) return json(400, { error: 'Unknown trek or sharing type' });
     if (!(travellers >= 1 && travellers <= 20)) return json(400, { error: 'Travellers must be 1–20' });
