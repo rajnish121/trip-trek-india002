@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Madhyamaheshwar Trek — Second Kedar | Trip Trek India</title>
 <meta name="description" content="5 Days / 4 Nights trek to Madhyamaheshwar, the second temple of the Panch Kedar circuit, from Ransi village through the Garhwal Himalayas, Uttarakhand. Delhi to Delhi departure.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛕</text></svg>">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#043C87"><text y=%22.9em%22 font-size=%2290%22>🛕</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
@@ -296,6 +300,14 @@
     section{padding:64px 0;}
     .wrap{padding:0 20px;}
   }
+
+  .closed-bar{background:#13243C;color:#fff;text-align:center;padding:12px 16px;font-size:14px;font-weight:600;}
+  .closed-bar b{color:#FFB199;}
+  .side-panel .side-item{display:none;}
+  .closed-note{text-align:center;padding:18px 6px;}
+  .closed-note .big{font-size:40px;}
+  .closed-note h3{margin:8px 0;color:#043C87;}
+  .closed-note p{margin:0 0 16px;color:#5A6B80;font-size:14.5px;}
 </style>
 </head>
 <body>
@@ -324,6 +336,7 @@
     <a href="#booking">Book Now</a>
   </div>
 </nav>
+<div class="closed-bar">Bookings closed for now — <b>Opens 2027</b>. Message us on WhatsApp to be notified when seats open.</div>
 
 <section class="hero" id="hero">
   <div class="wrap hero-inner">
@@ -851,5 +864,13 @@
   });
 </script>
 
+<script>
+  // Trip closed: replace booking form, disable booking buttons
+  (function(){
+    var card=document.querySelector('.form-card');
+    if(card) card.innerHTML='<div class="closed-note"><div class="big">🏔️</div><h3>Bookings closed for now</h3><p>Opens 2027. Leave us a message and we will tell you the moment seats open.</p><a class="btn btn-primary" href="https://wa.me/919310965771?text=Hi%20Trip%20Trek%20India%21%20Please%20notify%20me%20when%20Madhyamaheshwar%20Trek%20opens%20%28Opens%202027%29." target="_blank" rel="noopener">Notify me on WhatsApp</a></div>';
+    document.querySelectorAll('.book-btn').forEach(function(b){b.disabled=true;b.textContent='Closed · Opens 2027';b.style.opacity='.6';b.style.cursor='not-allowed';});
+  })();
+</script>
 </body>
 </html>
