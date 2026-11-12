@@ -1,5 +1,5 @@
 // Team admin API. Every call must carry a Supabase login whose email is in ADMIN_EMAILS.
-const { json, sb, requireAdmin, sendConfirmationEmail, DATA } = require('./_lib');
+const { json, sb, crypto, requireAdmin, sendConfirmationEmail, DATA, ADVANCE_PER_PERSON } = require('./_lib');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'POST only' });
@@ -10,7 +10,7 @@ exports.handler = async (event) => {
 
     if (p.action === 'bookings') {
       const rows = await sb('bookings?select=*&order=created_at.desc&limit=1000');
-      return json(200, { bookings: rows, trips: DATA.names });
+      return json(200, { bookings: rows, trips: DATA.names, prices: DATA.prices, advance: ADVANCE_PER_PERSON });
     }
     if (p.action === 'subscribers') {
       const rows = await sb('subscribers?select=*&order=created_at.desc&limit=5000');
@@ -37,6 +37,36 @@ exports.handler = async (event) => {
       if (!Object.keys(patch).length) return json(400, { error: 'Nothing to update' });
       const r = await sb('bookings?id=eq.' + id, { method: 'PATCH', body: patch });
       return json(200, { booking: r && r[0] });
+    }
+    if (p.action === 'links') {
+      const rows = await sb('payment_links?select=*&order=created_at.desc&limit=200');
+      return json(200, { links: rows });
+    }
+    if (p.action === 'create_link') {
+      const trek = String(p.trek || ''), sharing = String(p.sharing || '');
+      const travellers = parseInt(p.travellers, 10), price = parseInt(p.price, 10);
+      const name = String(p.name || '').trim(), email = String(p.email || '').trim().toLowerCase();
+      const phone = String(p.phone || '').replace(/\s|\+91|^0/g, '');
+      const days = Math.min(Math.max(parseInt(p.expiry_days, 10) || 3, 1), 30);
+      let adv = parseInt(p.advance, 10); if (!(adv >= 500)) adv = ADVANCE_PER_PERSON;
+      if (!(DATA.prices[trek] && DATA.prices[trek][sharing])) return json(400, { error: 'Pick a trip and sharing type' });
+      if (!(travellers >= 1 && travellers <= 20)) return json(400, { error: 'Travellers must be 1–20' });
+      if (!(price >= 1000 && price <= 200000)) return json(400, { error: 'Enter a valid price per person' });
+      if (adv > price) adv = price;
+      if (name.length < 2) return json(400, { error: 'Enter the customer name' });
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json(400, { error: 'Enter a valid customer email' });
+      if (!/^[6-9]\d{9}$/.test(phone)) return json(400, { error: 'Enter a valid 10-digit mobile number' });
+      const code = crypto.randomBytes(7).toString('base64url');
+      const row = await sb('payment_links', { method: 'POST', body: {
+        code, trek, sharing, travellers, name, email, phone, price_per_person: price, advance_per_person: adv,
+        travel_date: /^\d{4}-\d{2}-\d{2}$/.test(p.date || '') ? p.date : null,
+        note: String(p.note || '').slice(0, 300) || null, created_by: admin.email,
+        expires_at: new Date(Date.now() + days * 86400000).toISOString() } });
+      return json(200, { link: row[0], url: (process.env.SITE_URL || 'https://triptrekindia.in') + '/pay/?c=' + code });
+    }
+    if (p.action === 'cancel_link') {
+      await sb('payment_links?id=eq.' + encodeURIComponent(p.id || '') + '&used_at=is.null', { method: 'PATCH', body: { cancelled_at: new Date().toISOString() }, prefer: 'return=minimal' });
+      return json(200, { ok: true });
     }
     if (p.action === 'resend') {
       const b = (await sb('bookings?id=eq.' + encodeURIComponent(p.id || '') + '&select=*'))[0];

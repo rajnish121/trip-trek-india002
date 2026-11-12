@@ -15,7 +15,7 @@ main{max-width:1200px;margin:20px auto;padding:0 14px}
 input,select,textarea{padding:9px 11px;border:1px solid #cfd8e6;border-radius:9px;font:400 14px Poppins;max-width:100%}
 .btn{padding:9px 14px;border:0;border-radius:9px;background:var(--orange);color:#fff;font:600 13px Poppins;cursor:pointer}
 .btn.alt{background:#fff;color:var(--navy);border:1px solid var(--line)}.btn.red{background:#B42318}.btn[disabled]{opacity:.6}
-.hidden{display:none}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.hidden{display:none!important}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
 .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}.stat small{color:var(--grey);display:block}.stat b{font-size:22px;color:var(--navy)}
 .bar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;align-items:center}.bar input{flex:1;min-width:180px}
 .tabs button{padding:9px 16px;border:1px solid var(--line);background:#fff;border-radius:9px;font:600 13px Poppins;cursor:pointer;color:var(--grey);margin-right:6px}.tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
@@ -38,7 +38,7 @@ label{font-weight:600;font-size:13px;display:block;margin:10px 0 5px}
 <div class="msg" id="msg"></div>
 <div id="app" class="hidden">
   <div class="stats" id="stats"></div>
-  <div class="tabs"><button class="on" data-t="b">Bookings</button><button data-t="r">Requests <span id="rc"></span></button><button data-t="s">Subscribers</button></div>
+  <div class="tabs"><button class="on" data-t="b">Bookings</button><button data-t="r">Requests <span id="rc"></span></button><button data-t="s">Subscribers</button><button data-t="l">Payment links</button></div>
   <div class="bar" id="bar">
     <input id="q" placeholder="Search name, phone, email, trip…">
     <select id="fs"><option value="">All status</option><option>confirmed</option><option>pending</option><option>cancelled</option></select>
@@ -46,13 +46,34 @@ label{font-weight:600;font-size:13px;display:block;margin:10px 0 5px}
     <select id="fb"><option value="">Balance: any</option><option value="due">Balance due</option><option value="paid">Fully paid</option></select>
     <button class="btn alt" id="csv">Export CSV</button><button class="btn alt" id="ref">Refresh</button>
   </div>
-  <div class="wrap"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+  <div id="lp" class="hidden">
+  <div class="card"><h3 style="margin:0 0 4px;color:var(--navy)">Create a payment link</h3><p style="margin:0 0 10px;color:var(--grey)">Pick a trip, set the price you agreed, and send the link to the customer.</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+    <div><label>Trip</label><select id="lt" style="width:100%"></select></div>
+    <div><label>Sharing</label><select id="ls" style="width:100%"></select></div>
+    <div><label>Travellers</label><input id="ln" type="number" min="1" max="20" value="2" style="width:100%"></div>
+    <div><label>Price per person (₹)</label><input id="lpx" type="number" style="width:100%"><small id="lstd" style="color:var(--grey)"></small></div>
+    <div><label>Advance per person (₹)</label><input id="la" type="number" value="2000" style="width:100%"></div>
+    <div><label>Travel date (optional)</label><input id="ld" type="date" style="width:100%"></div>
+    <div><label>Customer name</label><input id="lna" style="width:100%"></div>
+    <div><label>Mobile</label><input id="lph" inputmode="numeric" style="width:100%"></div>
+    <div><label>Email</label><input id="lem" type="email" style="width:100%"></div>
+    <div><label>Link valid for (days)</label><input id="lx" type="number" min="1" max="30" value="3" style="width:100%"></div>
+  </div>
+  <label>Note shown to customer (optional)</label><input id="lno" maxlength="300" style="width:100%" placeholder="e.g. Special group price">
+  <p id="lsum" style="font-weight:600;color:var(--navy)"></p>
+  <button class="btn" id="lgo">Create link</button>
+  <div id="lres" class="hidden" style="margin-top:14px;background:#E8F6EF;border-radius:10px;padding:12px"></div></div>
+  <h3 style="margin:18px 0 8px">Recent links</h3>
+  <div class="wrap"><table><thead><tr><th>Created</th><th>Customer</th><th>Trip</th><th>Price</th><th>Status</th><th></th></tr></thead><tbody id="lb"></tbody></table></div>
+</div>
+<div class="wrap" id="mainwrap"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 (async function(){
-var $=function(i){return document.getElementById(i)},sb,B=[],S=[],T={},tab='b',open=null;
+var $=function(i){return document.getElementById(i)},sb,B=[],S=[],T={},PR={},ADV=2000,LK=[],tab='b',open=null;
 var inr=function(n){return '₹'+Number(n||0).toLocaleString('en-IN')};
 var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
 function say(t,ok){var m=$('msg');m.textContent=t||'';m.className='msg'+(ok?' ok':'');m.style.display=t?'block':'none'}
@@ -71,7 +92,7 @@ async function start(u){
   $('login').classList.add('hidden');$('who').textContent=u.email;$('out').classList.remove('hidden');
   try{await load()}catch(e){$('app').classList.add('hidden');if(e.status===403)say('This email is not an authorised team member. Ask the owner to add it to ADMIN_EMAILS.');else say(e.message);return}
   $('app').classList.remove('hidden')}
-async function load(){var d=await api('bookings');B=d.bookings||[];T=d.trips||{};
+async function load(){var d=await api('bookings');B=d.bookings||[];T=d.trips||{};PR=d.prices||{};ADV=d.advance||2000;initLinkForm();
   if($('ft').options.length<2)Object.keys(T).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=T[k];$('ft').appendChild(o)});
   if(tab==='s'){S=(await api('subscribers')).subscribers||[]}draw()}
 function stats(){var c=B.filter(function(b){return b.status==='confirmed'});
@@ -85,7 +106,26 @@ function filt(){var q=$('q').value.toLowerCase(),fs=$('fs').value,ft=$('ft').val
     if(fs&&b.status!==fs)return false;if(ft&&b.trek!==ft)return false;
     if(fb==='due'&&!(b.status==='confirmed'&&b.balance_due>0))return false;if(fb==='paid'&&!(b.status==='confirmed'&&!(b.balance_due>0)))return false;
     return !q||[b.name,b.phone,b.email,b.trek_name].join(' ').toLowerCase().indexOf(q)>-1})}
+function initLinkForm(){if($('lt').options.length)return;Object.keys(T).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=T[k];$('lt').appendChild(o)});$('la').value=ADV;lsh()}
+function lsh(){var t=$('lt').value,sh=PR[t]||{};$('ls').innerHTML=Object.keys(sh).map(function(k){return'<option value="'+k+'">'+k+' — '+inr(sh[k])+'</option>'}).join('');lstd()}
+function lstd(){var p=(PR[$('lt').value]||{})[$('ls').value];$('lstd').textContent=p?'Website price: '+inr(p):'';if(p&&!$('lpx').dataset.t)$('lpx').value=p;lsum()}
+function lsum(){var p=parseInt($('lpx').value,10),n=parseInt($('ln').value,10),a=parseInt($('la').value,10),std=(PR[$('lt').value]||{})[$('ls').value];if(!(p>0&&n>0)){$('lsum').textContent='';return}
+  var tot=p*n,adv=Math.min((a||ADV)*n,tot);$('lsum').textContent='Total '+inr(tot)+' · Advance now '+inr(adv)+' · Balance '+inr(tot-adv)+(std?' · '+(p<std?Math.round((std-p)/std*100)+'% off':p>std?'above website price':'same as website'):'')}
+function drawLinks(){var now=Date.now();$('lb').innerHTML=LK.map(function(l){var st=l.used_at?'<span class="b confirmed">paid</span>':l.cancelled_at?'<span class="b cancelled">cancelled</span>':new Date(l.expires_at)<now?'<span class="b cancelled">expired</span>':'<span class="b pending">active</span>';
+  var u=location.origin+'/pay/?c='+l.code;return'<tr><td>'+new Date(l.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short'})+'</td><td><b>'+esc(l.name)+'</b><br><small>'+esc(l.phone)+'</small></td><td>'+esc(T[l.trek]||l.trek)+'<br><small>'+l.travellers+' · '+esc(l.sharing)+'</small></td><td>'+inr(l.price_per_person)+' pp<br><small>total '+inr(l.price_per_person*l.travellers)+'</small></td><td>'+st+'</td><td>'+(!l.used_at&&!l.cancelled_at&&new Date(l.expires_at)>now?'<button class="btn alt" data-c="'+u+'" data-p="'+l.phone+'" data-n="'+esc(l.name)+'">Copy / WhatsApp</button> <button class="btn alt" data-x="'+l.id+'">Cancel</button>':'')+'</td></tr>'}).join('')||'<tr><td colspan="6">No links yet.</td></tr>'}
+async function loadLinks(){LK=(await api('links')).links||[];drawLinks()}
+['lt'].forEach(function(i){$(i).onchange=function(){$('lpx').dataset.t='';lsh()}});$('ls').onchange=function(){$('lpx').dataset.t='';lstd()};
+['lpx','ln','la'].forEach(function(i){$(i).oninput=function(){if(i==='lpx')$('lpx').dataset.t='1';lsum()}});
+$('lgo').onclick=async function(){var b=this;b.disabled=true;
+  try{var d=await api('create_link',{trek:$('lt').value,sharing:$('ls').value,travellers:$('ln').value,price:$('lpx').value,advance:$('la').value,date:$('ld').value,name:$('lna').value,phone:$('lph').value,email:$('lem').value,expiry_days:$('lx').value,note:$('lno').value});
+    var wa='https://wa.me/91'+d.link.phone+'?text='+encodeURIComponent('Hi '+d.link.name+', here is your Trip Trek India booking link for '+T[d.link.trek]+': '+d.url+' (valid for '+$('lx').value+' days)');
+    $('lres').classList.remove('hidden');$('lres').innerHTML='<b>Link created</b><br><input readonly value="'+d.url+'" style="width:100%;margin:8px 0" onclick="this.select()"><a class="btn" style="text-decoration:none;display:inline-block" target="_blank" href="'+wa+'">Send on WhatsApp</a>';
+    await loadLinks();say('')}catch(e){say(e.message)}b.disabled=false};
+$('lb').onclick=async function(e){var x=e.target.closest('[data-x]'),c=e.target.closest('[data-c]');
+  if(x){if(!confirm('Cancel this link?'))return;await api('cancel_link',{id:x.dataset.x});return loadLinks()}
+  if(c){var u=c.dataset.c;try{await navigator.clipboard.writeText(u)}catch(_){}window.open('https://wa.me/91'+c.dataset.p+'?text='+encodeURIComponent('Hi '+c.dataset.n+', here is your Trip Trek India booking link: '+u),'_blank');say('Link copied.',1)}};
 function draw(){stats();
+  var L=tab==='l';$('lp').classList.toggle('hidden',!L);$('mainwrap').classList.toggle('hidden',L);$('bar').classList.toggle('hidden',L);if(L)return;
   $('bar').querySelectorAll('select').forEach(function(x){x.style.display=tab==='s'?'none':''});
   if(tab==='s'){$('th').innerHTML='<tr><th>Email</th><th>Name</th><th>Source</th><th>Joined</th><th>Status</th></tr>';
     var q=$('q').value.toLowerCase();$('tb').innerHTML=S.filter(function(s){return!q||(s.email+' '+(s.name||'')).toLowerCase().indexOf(q)>-1}).map(function(s){return'<tr><td>'+esc(s.email)+'</td><td>'+esc(s.name||'')+'</td><td>'+esc(s.source||'')+'</td><td>'+new Date(s.created_at).toLocaleDateString('en-IN')+'</td><td>'+(s.unsubscribed_at?'<span class="b cancelled">unsubscribed</span>':'<span class="b confirmed">active</span>')+'</td></tr>'}).join('')||'<tr><td colspan="5">No subscribers yet.</td></tr>';return}
@@ -115,7 +155,7 @@ $('tb').onclick=async function(e){
     if(a==='cancel'){if(!confirm('Mark this booking cancelled? (Refund is not processed automatically.)'))return btn.disabled=false;await api('update',{id:b.id,fields:{status:'cancelled'}})}
     if(a==='restore')await api('update',{id:b.id,fields:{status:'confirmed'}});
     say('Saved.',1);await load()}catch(err){say(err.message)}};
-document.querySelectorAll('.tabs button').forEach(function(t){t.onclick=async function(){document.querySelectorAll('.tabs button').forEach(function(x){x.classList.remove('on')});t.classList.add('on');tab=t.dataset.t;open=null;if(tab==='s'&&!S.length)S=(await api('subscribers')).subscribers||[];draw()}});
+document.querySelectorAll('.tabs button').forEach(function(t){t.onclick=async function(){document.querySelectorAll('.tabs button').forEach(function(x){x.classList.remove('on')});t.classList.add('on');tab=t.dataset.t;open=null;if(tab==='l')await loadLinks();if(tab==='s'&&!S.length)S=(await api('subscribers')).subscribers||[];draw()}});
 ['q','fs','ft','fb'].forEach(function(i){$(i).oninput=draw});$('ref').onclick=function(){load().then(function(){say('Refreshed.',1)}).catch(function(e){say(e.message)})};
 $('csv').onclick=function(){var rows=tab==='s'?S.map(function(s){return[s.email,s.name,s.source,s.created_at,s.unsubscribed_at]}):filt().map(function(b){return[b.created_at,b.name,b.phone,b.email,b.trek_name,b.sharing,b.travellers,b.travel_date,b.total_amount,b.advance_paid,b.balance_paid_amount,b.balance_due,b.status]});
   var h=tab==='s'?['email','name','source','joined','unsubscribed']:['booked','name','phone','email','trip','sharing','travellers','travel_date','total','advance_paid','balance_paid','balance_due','status'];
