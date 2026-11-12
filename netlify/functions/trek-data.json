@@ -77,6 +77,10 @@
     "munsiyari-khaliya-top": {
       "quad": 9999,
       "double": 10999
+    },
+    "kashmir-tour-5d4n": {
+      "quad": 9999,
+      "double": 10999
     }
   },
   "names": {
@@ -96,7 +100,8 @@
     "jaisalmer": "Jaisalmer Trip — Kuldhara & Longewala",
     "manali-kasol-4d3n": "Manali – Kasol Trip 4D/3N — Atal Tunnel & Kasol Camps",
     "harsil-valley": "Harsil Valley Trip — Gartang Gali & Gangotri",
-    "munsiyari-khaliya-top": "Munsiyari Khaliya Top Trip — Kasar Devi & Kumaon"
+    "munsiyari-khaliya-top": "Munsiyari Khaliya Top Trip — Kasar Devi & Kumaon",
+    "kashmir-tour-5d4n": "Kashmir Tour — Srinagar, Gulmarg, Sonmarg & Pahalgam"
   },
   "closed": {
     "yulla-kanda": "Opens April 2027",
