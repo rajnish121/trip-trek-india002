@@ -2,71 +2,85 @@
 User-agent: *
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 User-agent: Googlebot
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 User-agent: Bingbot
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 User-agent: GPTBot
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 User-agent: ChatGPT-User
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 User-agent: ClaudeBot
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 User-agent: Claude-SearchBot
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 User-agent: Claude-User
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 User-agent: Perplexity-User
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 User-agent: Google-Extended
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 User-agent: Applebot
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 User-agent: Applebot-Extended
 Allow: /
 Disallow: /account/
+Disallow: /admin/
 Disallow: /.netlify/functions/
 
 Sitemap: https://triptrekindia.in/sitemap.xml
