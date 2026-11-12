@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Complete your booking | Trip Trek India</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico?v=3" sizes="48x48">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#043C87;--orange:#EF3006;--ink:#13243C;--grey:#5A6B80;--line:#E3E8EF;--green:#1E8E5A;--bg:#F4F7FB}
+*{box-sizing:border-box}body{margin:0;font-family:Poppins,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+header{background:#fff;border-bottom:1px solid var(--line);padding:12px 20px}header img{height:44px}
+main{max-width:520px;margin:28px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px;box-shadow:0 4px 18px rgba(4,60,135,.06)}
+h1{font-size:22px;margin:0 0 4px;color:var(--navy)}.sub{color:var(--grey);font-size:14px;margin:0 0 16px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}.row span{color:var(--grey)}.row b{text-align:right}
+.big{background:#FFF4F1;border-radius:10px;padding:12px 14px;margin-top:16px;display:flex;justify-content:space-between;align-items:center}.big b{font-size:22px;color:var(--orange)}
+.btn{display:block;width:100%;margin-top:18px;padding:14px;border:0;border-radius:10px;background:var(--orange);color:#fff;font:600 16px Poppins;cursor:pointer}.btn[disabled]{opacity:.6}
+.note{font-size:13px;color:var(--grey);margin-top:12px}.err{background:#FDECEA;color:#B42318;padding:12px;border-radius:10px;font-size:14px}.ok{background:#E8F6EF;color:#14663f;padding:14px;border-radius:10px;font-size:14px}.hidden{display:none}
+</style></head><body>
+<header><img src="/assets/logo.png" alt="Trip Trek India"></header>
+<main><div class="card" id="c"><p class="sub">Loading your booking…</p></div></main>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+(async function(){
+var c=document.getElementById('c'),code=new URLSearchParams(location.search).get('c')||'',L;
+var inr=function(n){return '₹'+Number(n||0).toLocaleString('en-IN')};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(x){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[x]})};
+function fail(t){c.innerHTML='<h1>Payment link</h1><div class="err">'+esc(t)+'</div><p class="note">Need help? Call +91 93109 65771 or +91 88105 55416.</p>'}
+try{var r=await fetch('/.netlify/functions/link-info?c='+encodeURIComponent(code));L=await r.json();if(!r.ok)return fail(L.error)}catch(e){return fail('Could not load this link. Please try again.')}
+c.innerHTML='<h1>Hi '+esc(L.name.split(' ')[0])+', your booking is ready</h1><p class="sub">Pay the advance to confirm your seat.</p>'
++'<div class="row"><span>Trip</span><b>'+esc(L.trek_name)+'</b></div>'
++'<div class="row"><span>Travellers</span><b>'+esc(L.travellers)+' ('+esc(L.sharing)+' sharing)</b></div>'
++'<div class="row"><span>Preferred date</span><b>'+esc(L.travel_date||'To be confirmed')+'</b></div>'
++'<div class="row"><span>Price per person</span><b>'+inr(L.price_per_person)+'</b></div>'
++'<div class="row"><span>Trip total</span><b>'+inr(L.total)+'</b></div>'
++'<div class="row"><span>Balance (at onboarding or online later)</span><b>'+inr(L.balance)+'</b></div>'
++(L.note?'<p class="note">'+esc(L.note)+'</p>':'')
++'<div class="big"><span>Pay now (advance)</span><b>'+inr(L.advance)+'</b></div>'
++'<button class="btn" id="pay">Pay '+inr(L.advance)+' securely</button><div class="note" id="m">Secure payment by Razorpay. By paying you agree to our <a href="/terms-and-conditions.html">terms</a> and <a href="/refund-policy.html">refund policy</a>.</div>';
+var btn=document.getElementById('pay'),m=document.getElementById('m');
+btn.onclick=async function(){
+  btn.disabled=true;
+  try{
+    var o=await(await fetch('/.netlify/functions/link-order',{method:'POST',body:JSON.stringify({code:code})})).json();
+    if(!o.order_id)throw new Error(o.error||'Could not start payment');
+    new Razorpay({key:o.key,amount:o.amount,currency:'INR',order_id:o.order_id,name:'Trip Trek India',description:o.trek_name,prefill:{name:o.name,email:o.email,contact:o.phone},theme:{color:'#043C87'},
+      handler:async function(resp){
+        try{var v=await fetch('/.netlify/functions/verify-payment',{method:'POST',body:JSON.stringify(resp)});if(!v.ok)throw 0}catch(_){}
+        c.innerHTML='<h1>Booking confirmed ✅</h1><div class="ok">Thank you, '+esc(L.name.split(' ')[0])+'! We have emailed your confirmation to your email address. You can see your booking anytime at <a href="/account/">My Account</a>.</div>'},
+      modal:{ondismiss:function(){btn.disabled=false}}}).open();
+  }catch(e){m.className='err';m.textContent=e.message;btn.disabled=false}
+};
+})();
+</script></body></html>

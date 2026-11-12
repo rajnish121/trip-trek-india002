@@ -240,6 +240,8 @@ async function confirmBooking(orderId, paymentId) {
     return { booking: again[0], alreadyConfirmed: true };
   }
   b = updated[0];
+  // If this booking came from a team payment link, mark the link used.
+  try { await sb('payment_links?razorpay_order_id=eq.' + encodeURIComponent(orderId) + '&used_at=is.null', { method: 'PATCH', body: { used_at: new Date().toISOString() }, prefer: 'return=minimal' }); } catch (e) { console.error('link mark failed', e); }
   // Each step is isolated: a failure in one never blocks the booking or the others.
   for (const step of [sendConfirmationEmail, appendToSheet, notifyTeam]) {
     try { await step(b); } catch (e) { console.error(step.name + ' failed', e); }
