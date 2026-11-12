@@ -73,6 +73,10 @@
     "harsil-valley": {
       "quad": 8999,
       "double": 9999
+    },
+    "munsiyari-khaliya-top": {
+      "quad": 9999,
+      "double": 10999
     }
   },
   "names": {
@@ -91,7 +95,8 @@
     "kedarkantha": "Kedarkantha Trek — Sankri, Uttarakhand",
     "jaisalmer": "Jaisalmer Trip — Kuldhara & Longewala",
     "manali-kasol-4d3n": "Manali – Kasol Trip 4D/3N — Atal Tunnel & Kasol Camps",
-    "harsil-valley": "Harsil Valley Trip — Gartang Gali & Gangotri"
+    "harsil-valley": "Harsil Valley Trip — Gartang Gali & Gangotri",
+    "munsiyari-khaliya-top": "Munsiyari Khaliya Top Trip — Kasar Devi & Kumaon"
   },
   "closed": {
     "yulla-kanda": "Opens April 2027",
