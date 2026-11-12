@@ -38,7 +38,7 @@ label{font-weight:600;font-size:13px;display:block;margin:10px 0 5px}
 <div class="msg" id="msg"></div>
 <div id="app" class="hidden">
   <div class="stats" id="stats"></div>
-  <div class="tabs"><button class="on" data-t="b">Bookings</button><button data-t="r">Requests <span id="rc"></span></button><button data-t="s">Subscribers</button><button data-t="l">Payment links</button></div>
+  <div class="tabs"><button class="on" data-t="b">Bookings</button><button data-t="r">Requests <span id="rc"></span></button><button data-t="s">Subscribers</button><button data-t="l">Payment links</button><button data-t="v">Reviews <span id="vc"></span></button></div>
   <div class="bar" id="bar">
     <input id="q" placeholder="Search name, phone, email, trip…">
     <select id="fs"><option value="">All status</option><option>confirmed</option><option>pending</option><option>cancelled</option></select>
@@ -67,13 +67,17 @@ label{font-weight:600;font-size:13px;display:block;margin:10px 0 5px}
   <h3 style="margin:18px 0 8px">Recent links</h3>
   <div class="wrap"><table><thead><tr><th>Created</th><th>Customer</th><th>Trip</th><th>Price</th><th>Status</th><th></th></tr></thead><tbody id="lb"></tbody></table></div>
 </div>
+<div id="vp" class="hidden">
+  <p style="color:var(--grey);margin:0 0 10px">Reviews written by travellers who booked with us. Only <b>approved</b> reviews appear on the trip pages. You can fix typos in the text before approving.</p>
+  <div class="wrap"><table><thead><tr><th>Received</th><th>Trip</th><th>Traveller</th><th>Review</th><th>Status</th><th></th></tr></thead><tbody id="vb"></tbody></table></div>
+</div>
 <div class="wrap" id="mainwrap"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 (async function(){
-var $=function(i){return document.getElementById(i)},sb,B=[],S=[],T={},PR={},ADV=2000,LK=[],tab='b',open=null;
+var $=function(i){return document.getElementById(i)},sb,B=[],S=[],T={},PR={},ADV=2000,LK=[],RV=[],tab='b',open=null;
 var inr=function(n){return '₹'+Number(n||0).toLocaleString('en-IN')};
 var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
 function say(t,ok){var m=$('msg');m.textContent=t||'';m.className='msg'+(ok?' ok':'');m.style.display=t?'block':'none'}
@@ -94,7 +98,7 @@ async function start(u){
   $('app').classList.remove('hidden')}
 async function load(){var d=await api('bookings');B=d.bookings||[];T=d.trips||{};PR=d.prices||{};ADV=d.advance||2000;initLinkForm();
   if($('ft').options.length<2)Object.keys(T).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=T[k];$('ft').appendChild(o)});
-  if(tab==='s'){S=(await api('subscribers')).subscribers||[]}draw()}
+  if(tab==='s'){S=(await api('subscribers')).subscribers||[]}try{RV=(await api('reviews')).reviews||[];drawRevCount()}catch(_){}draw()}
 function stats(){var c=B.filter(function(b){return b.status==='confirmed'});
   var adv=0,bal=0,due=0,tr=0;c.forEach(function(b){adv+=b.advance_paid||0;bal+=b.balance_paid_amount||0;due+=b.balance_due||0;tr+=b.travellers||0});
   var rq=B.filter(function(b){return b.cancel_requested_at}).length;$('rc').textContent=rq?'('+rq+')':'';
@@ -113,6 +117,16 @@ function lsum(){var p=parseInt($('lpx').value,10),n=parseInt($('ln').value,10),a
   var tot=p*n,adv=Math.min((a||ADV)*n,tot);$('lsum').textContent='Total '+inr(tot)+' · Advance now '+inr(adv)+' · Balance '+inr(tot-adv)+(std?' · '+(p<std?Math.round((std-p)/std*100)+'% off':p>std?'above website price':'same as website'):'')}
 function drawLinks(){var now=Date.now();$('lb').innerHTML=LK.map(function(l){var st=l.used_at?'<span class="b confirmed">paid</span>':l.cancelled_at?'<span class="b cancelled">cancelled</span>':new Date(l.expires_at)<now?'<span class="b cancelled">expired</span>':'<span class="b pending">active</span>';
   var u=location.origin+'/pay/?c='+l.code;return'<tr><td>'+new Date(l.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short'})+'</td><td><b>'+esc(l.name)+'</b><br><small>'+esc(l.phone)+'</small></td><td>'+esc(T[l.trek]||l.trek)+'<br><small>'+l.travellers+' · '+esc(l.sharing)+'</small></td><td>'+inr(l.price_per_person)+' pp<br><small>total '+inr(l.price_per_person*l.travellers)+'</small></td><td>'+st+'</td><td>'+(!l.used_at&&!l.cancelled_at&&new Date(l.expires_at)>now?'<button class="btn alt" data-c="'+u+'" data-p="'+l.phone+'" data-n="'+esc(l.name)+'">Copy / WhatsApp</button> <button class="btn alt" data-x="'+l.id+'">Cancel</button>':'')+'</td></tr>'}).join('')||'<tr><td colspan="6">No links yet.</td></tr>'}
+function drawRevCount(){var n=RV.filter(function(r){return r.status==='pending'}).length;$('vc').textContent=n?'('+n+')':''}
+function drawRev(){var pend=RV.filter(function(r){return r.status==='pending'}).length;$('vc').textContent=pend?'('+pend+')':'';
+  $('vb').innerHTML=RV.map(function(r){var d=new Date(r.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
+    return'<tr data-id="'+r.id+'"><td>'+d+'</td><td>'+esc(T[r.trek]||r.trek)+'</td><td><input class="rvn" value="'+esc(r.display_name)+'" maxlength="40" style="width:130px"><br><small>'+esc(r.email)+'</small><br><span style="color:#F5A623">'+'★'.repeat(r.rating)+'</span><span style="color:#D5DBE5">'+'★'.repeat(5-r.rating)+'</span></td>'
+    +'<td><textarea class="rvt" maxlength="1000" style="width:100%;min-width:240px;min-height:80px">'+esc(r.body)+'</textarea></td><td><span class="b '+(r.status==='approved'?'confirmed':r.status==='rejected'?'cancelled':'pending')+'">'+r.status+'</span></td>'
+    +'<td style="white-space:nowrap"><button class="btn" data-v="approved">'+(r.status==='approved'?'Save':'Approve')+'</button> '+(r.status!=='rejected'?'<button class="btn alt" data-v="rejected">Reject</button> ':'')+'<button class="btn red" data-v="delete">Delete</button></td></tr>'}).join('')||'<tr><td colspan="6">No reviews yet. Travellers can write one from My Account after their trip date.</td></tr>'}
+async function loadRev(){var d=await api('reviews');RV=d.reviews||[];if(d.trips)T=d.trips;drawRev()}
+$('vb').onclick=async function(e){var b=e.target.closest('[data-v]');if(!b)return;var tr=b.closest('tr'),id=tr.dataset.id,v=b.dataset.v;
+  if(v==='delete'&&!confirm('Delete this review for good?'))return;b.disabled=true;
+  try{await api('review_set',{id:id,status:v,display_name:tr.querySelector('.rvn').value,body:tr.querySelector('.rvt').value});say(v==='approved'?'Approved. It will show on the trip page within a few minutes.':'Done.',1);await loadRev()}catch(err){say(err.message);b.disabled=false}};
 async function loadLinks(){LK=(await api('links')).links||[];drawLinks()}
 ['lt'].forEach(function(i){$(i).onchange=function(){$('lpx').dataset.t='';lsh()}});$('ls').onchange=function(){$('lpx').dataset.t='';lstd()};
 ['lpx','ln','la'].forEach(function(i){$(i).oninput=function(){if(i==='lpx')$('lpx').dataset.t='1';lsum()}});
@@ -125,7 +139,7 @@ $('lb').onclick=async function(e){var x=e.target.closest('[data-x]'),c=e.target.
   if(x){if(!confirm('Cancel this link?'))return;await api('cancel_link',{id:x.dataset.x});return loadLinks()}
   if(c){var u=c.dataset.c;try{await navigator.clipboard.writeText(u)}catch(_){}window.open('https://wa.me/91'+c.dataset.p+'?text='+encodeURIComponent('Hi '+c.dataset.n+', here is your Trip Trek India booking link: '+u),'_blank');say('Link copied.',1)}};
 function draw(){stats();
-  var L=tab==='l';$('lp').classList.toggle('hidden',!L);$('mainwrap').classList.toggle('hidden',L);$('bar').classList.toggle('hidden',L);if(L)return;
+  var L=tab==='l',V=tab==='v';$('lp').classList.toggle('hidden',!L);$('vp').classList.toggle('hidden',!V);$('mainwrap').classList.toggle('hidden',L||V);$('bar').classList.toggle('hidden',L||V);if(V){drawRev();return}if(L)return;
   $('bar').querySelectorAll('select').forEach(function(x){x.style.display=tab==='s'?'none':''});
   if(tab==='s'){$('th').innerHTML='<tr><th>Email</th><th>Name</th><th>Source</th><th>Joined</th><th>Status</th></tr>';
     var q=$('q').value.toLowerCase();$('tb').innerHTML=S.filter(function(s){return!q||(s.email+' '+(s.name||'')).toLowerCase().indexOf(q)>-1}).map(function(s){return'<tr><td>'+esc(s.email)+'</td><td>'+esc(s.name||'')+'</td><td>'+esc(s.source||'')+'</td><td>'+new Date(s.created_at).toLocaleDateString('en-IN')+'</td><td>'+(s.unsubscribed_at?'<span class="b cancelled">unsubscribed</span>':'<span class="b confirmed">active</span>')+'</td></tr>'}).join('')||'<tr><td colspan="5">No subscribers yet.</td></tr>';return}
@@ -155,7 +169,7 @@ $('tb').onclick=async function(e){
     if(a==='cancel'){if(!confirm('Mark this booking cancelled? (Refund is not processed automatically.)'))return btn.disabled=false;await api('update',{id:b.id,fields:{status:'cancelled'}})}
     if(a==='restore')await api('update',{id:b.id,fields:{status:'confirmed'}});
     say('Saved.',1);await load()}catch(err){say(err.message)}};
-document.querySelectorAll('.tabs button').forEach(function(t){t.onclick=async function(){document.querySelectorAll('.tabs button').forEach(function(x){x.classList.remove('on')});t.classList.add('on');tab=t.dataset.t;open=null;if(tab==='l')await loadLinks();if(tab==='s'&&!S.length)S=(await api('subscribers')).subscribers||[];draw()}});
+document.querySelectorAll('.tabs button').forEach(function(t){t.onclick=async function(){document.querySelectorAll('.tabs button').forEach(function(x){x.classList.remove('on')});t.classList.add('on');tab=t.dataset.t;open=null;if(tab==='l')await loadLinks();if(tab==='v')await loadRev();if(tab==='s'&&!S.length)S=(await api('subscribers')).subscribers||[];draw()}});
 ['q','fs','ft','fb'].forEach(function(i){$(i).oninput=draw});$('ref').onclick=function(){load().then(function(){say('Refreshed.',1)}).catch(function(e){say(e.message)})};
 $('csv').onclick=function(){var rows=tab==='s'?S.map(function(s){return[s.email,s.name,s.source,s.created_at,s.unsubscribed_at]}):filt().map(function(b){return[b.created_at,b.name,b.phone,b.email,b.trek_name,b.sharing,b.travellers,b.travel_date,b.total_amount,b.advance_paid,b.balance_paid_amount,b.balance_due,b.status]});
   var h=tab==='s'?['email','name','source','joined','unsubscribed']:['booked','name','phone','email','trip','sharing','travellers','travel_date','total','advance_paid','balance_paid','balance_due','status'];

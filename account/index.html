@@ -50,6 +50,11 @@
   .acts .pay{background:var(--orange);border-color:var(--orange);color:#fff}
   .req-box{margin-top:12px;display:none} .req-box textarea{width:100%;padding:10px;border:1px solid #cfd8e6;border-radius:10px;font:400 14px Poppins;min-height:70px}
   .req-box select{padding:9px;border-radius:9px;border:1px solid #cfd8e6;font:400 14px Poppins;margin-bottom:8px}
+  .rv-box{margin-top:12px;display:none;background:var(--bg);border-radius:10px;padding:12px}
+  .rv-box input,.rv-box textarea{width:100%;padding:10px;border:1px solid #cfd8e6;border-radius:10px;font:400 14px Poppins;margin-top:8px}
+  .rv-box textarea{min-height:90px}
+  .rv-stars{display:flex;gap:4px;margin-top:4px}.rv-stars button{border:0;background:none;font-size:30px;line-height:1;color:#D5DBE5;cursor:pointer;padding:0 2px}.rv-stars button.on{color:#F5A623}
+  .rv-done{margin-top:12px;font-size:13px;color:var(--green);background:#E8F6EF;border-radius:10px;padding:10px 12px}
   .note{font-size:12px;color:var(--grey);margin-top:10px}
   @media(max-width:520px){.profile{grid-template-columns:1fr}}
 </style>
@@ -186,7 +191,12 @@
       $('bPhone').textContent = phone ? ' and mobile +91 ' + phone : '';
     }
     window.__rows = rows;
+    await loadRev();
     render();
+  }
+  async function loadRev(){
+    window.__rev = {};
+    try{ var d = await api('submit-review',{action:'mine'}); (d.reviews||[]).forEach(function(r){ window.__rev[String(r.booking_id)] = r; }); }catch(_){}
   }
 
   function render(){
@@ -203,6 +213,16 @@
         acts += '<a href="/itineraries/'+encodeURIComponent(b.trek)+'.pdf" target="_blank" rel="noopener">Itinerary PDF</a>';
         acts += '<button data-a="req" data-id="'+b.id+'">Change / cancel</button>';
       }
+      var today = new Date(Date.now()+5.5*3600*1000).toISOString().slice(0,10);
+      var rv = (window.__rev||{})[String(b.id)], canRev = ok && !rv && b.travel_date && b.travel_date <= today, revHtml = '';
+      if(canRev) acts += '<button data-a="rev" data-id="'+b.id+'">Write a review</button>';
+      if(canRev) revHtml = '<div class="rv-box" id="rv-'+b.id+'"><b>How was '+esc(b.trek_name||b.trek)+'?</b><div class="rv-stars" id="rvs-'+b.id+'" data-v="0">'
+        + [1,2,3,4,5].map(function(n){return '<button type="button" data-a="star" data-id="'+b.id+'" data-v="'+n+'" aria-label="'+n+' star'+(n>1?'s':'')+'">★</button>'}).join('') + '</div>'
+        + '<input id="rvn-'+b.id+'" maxlength="40" placeholder="Name to show (e.g. Rahul S.)" value="'+esc(String(b.name||'').split(' ')[0])+'">'
+        + '<textarea id="rvt-'+b.id+'" maxlength="1000" placeholder="Tell other travellers about your trip: the route, the stay, the group, anything you loved or would improve."></textarea>'
+        + '<div class="acts"><button class="pay" data-a="sendrev" data-id="'+b.id+'">Submit review</button></div>'
+        + '<div class="note">Our team checks every review before it appears on the trip page.</div></div>';
+      if(rv) revHtml = '<div class="rv-done">'+(rv.status==='approved' ? 'Your review is live on the trip page. Thank you!' : rv.status==='rejected' ? 'Thank you for your feedback.' : 'Thank you! Your review is waiting for our team to approve it.')+'</div>';
       var reqBox = ok ? '<div class="req-box" id="rb-'+b.id+'"><select id="rt-'+b.id+'"><option value="change">Change my date / details</option><option value="cancel">Cancel my booking</option></select>'
         + '<textarea id="rm-'+b.id+'" placeholder="Tell us what you need…"></textarea><div class="acts"><button class="pay" data-a="sendreq" data-id="'+b.id+'">Send request</button></div>'
         + '<div class="note">Refunds follow our <a href="/refund-policy.html">refund policy</a>. Our team will contact you.</div></div>' : '';
@@ -214,7 +234,7 @@
         + '<div>'+(paidFull?'Balance paid':'Balance due')+'<b>'+(paidFull?inr(b.balance_paid_amount):inr(b.balance_due))+'</b></div>'
         + '<div>Total<b>'+inr(b.total_amount)+'</b></div>'
         + '<div>Payment ID<b>'+esc(b.razorpay_payment_id||'—')+'</b></div>'
-        + '</div>' + (b.cancel_requested_at ? '<div class="note">Your request has been sent to our team.</div>' : '') + '<div class="acts">'+acts+'</div>' + reqBox + '</div>';
+        + '</div>' + (b.cancel_requested_at ? '<div class="note">Your request has been sent to our team.</div>' : '') + '<div class="acts">'+acts+'</div>' + revHtml + reqBox + '</div>';
     }).join('');
   }
 
@@ -225,7 +245,7 @@
   }
   async function reload(){
     var bk = await sb.from('bookings').select('*').order('created_at',{ascending:false});
-    window.__rows = (bk.data||[]).filter(function(b){return b.status==='confirmed'||b.status==='pending'}); render();
+    window.__rows = (bk.data||[]).filter(function(b){return b.status==='confirmed'||b.status==='pending'}); await loadRev(); render();
   }
   function receipt(b){
     var w = window.open('','_blank'); if(!w) return alert('Please allow pop-ups to view the receipt.');
@@ -243,6 +263,13 @@
     var b = (window.__rows||[]).filter(function(x){return String(x.id)===id})[0]; if(!b) return;
     try{
       if(a==='receipt') return receipt(b);
+      if(a==='rev'){ var vb=$('rv-'+id); vb.style.display = vb.style.display==='block'?'none':'block'; return; }
+      if(a==='star'){ var n=parseInt(el.getAttribute('data-v'),10), sb2=$('rvs-'+id); sb2.setAttribute('data-v',n); [].forEach.call(sb2.children,function(x,i){ x.classList.toggle('on', i<n); }); return; }
+      if(a==='sendrev'){
+        el.disabled = true;
+        await api('submit-review',{action:'submit',booking_id:b.id,rating:parseInt($('rvs-'+id).getAttribute('data-v'),10),name:$('rvn-'+id).value,body:$('rvt-'+id).value});
+        say('Thank you! Your review has been sent to our team for approval.','ok'); await reload(); return;
+      }
       if(a==='req'){ var rb=$('rb-'+id); rb.style.display = rb.style.display==='block'?'none':'block'; return; }
       if(a==='sendreq'){
         el.disabled = true;
