@@ -109,7 +109,7 @@ $('tb').onclick=async function(e){
   if(!btn)return;var b=B.filter(function(x){return x.id===open})[0];if(!b)return;var a=btn.dataset.a;btn.disabled=true;
   try{
     if(a==='save')await api('update',{id:b.id,fields:{admin_notes:$('nt').value,travel_date:$('dt').value||null}});
-    if(a==='resend'){await api('resend',{id:b.id,whatsapp:confirm('Also send the WhatsApp message?')});say('Sent.',1);btn.disabled=false;return}
+    if(a==='resend'){await api('resend',{id:b.id});say('Sent.',1);btn.disabled=false;return}
     if(a==='offline'){if(!confirm('Record the full balance as received offline?'))return btn.disabled=false;await api('update',{id:b.id,fields:{balance_received_offline:true}})}
     if(a==='clear')await api('update',{id:b.id,fields:{clear_request:true}});
     if(a==='cancel'){if(!confirm('Mark this booking cancelled? (Refund is not processed automatically.)'))return btn.disabled=false;await api('update',{id:b.id,fields:{status:'cancelled'}})}

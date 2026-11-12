@@ -1,5 +1,5 @@
 // Team admin API. Every call must carry a Supabase login whose email is in ADMIN_EMAILS.
-const { json, sb, requireAdmin, sendConfirmationEmail, whatsappConfirmation, DATA } = require('./_lib');
+const { json, sb, requireAdmin, sendConfirmationEmail, DATA } = require('./_lib');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'POST only' });
@@ -42,7 +42,6 @@ exports.handler = async (event) => {
       const b = (await sb('bookings?id=eq.' + encodeURIComponent(p.id || '') + '&select=*'))[0];
       if (!b || b.status !== 'confirmed') return json(400, { error: 'Only confirmed bookings' });
       await sendConfirmationEmail(b);
-      if (p.whatsapp) await whatsappConfirmation(b);
       return json(200, { ok: true });
     }
     return json(400, { error: 'Unknown action' });

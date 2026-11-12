@@ -171,33 +171,6 @@ const wrapMail = (title, inner) => `<div style="font-family:Arial,Helvetica,sans
   <div style="background:#043C87;color:#fff;padding:18px 24px;border-radius:10px 10px 0 0"><div style="font-size:19px;font-weight:700">${title}</div><div style="opacity:.85;font-size:13px">Trip Trek India</div></div>
   <div style="border:1px solid #e3e8ef;border-top:0;padding:22px 24px;border-radius:0 0 10px 10px;font-size:14px;line-height:1.6">${inner}</div></div>`;
 
-// ---- WhatsApp (Meta Cloud API, template messages). Skipped unless configured. ----
-// Templates take positional {{1}}, {{2}}... text parameters.
-async function sendWhatsApp(phone10, templateEnvKey, params) {
-  const token = process.env.WHATSAPP_TOKEN, id = process.env.WHATSAPP_PHONE_ID, tpl = process.env[templateEnvKey];
-  if (!token || !id || !tpl || !phone10) return { skipped: true };
-  const res = await fetch('https://graph.facebook.com/v20.0/' + id + '/messages', {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      messaging_product: 'whatsapp',
-      to: '91' + String(phone10).replace(/\D/g, '').slice(-10),
-      type: 'template',
-      template: {
-        name: tpl,
-        language: { code: process.env.WHATSAPP_LANG || 'en' },
-        components: [{ type: 'body', parameters: params.map((t) => ({ type: 'text', text: String(t) })) }],
-      },
-    }),
-  });
-  if (!res.ok) console.error('WhatsApp error', res.status, await res.text());
-  return { ok: res.ok };
-}
-async function whatsappConfirmation(b) {
-  return sendWhatsApp(b.phone, 'WHATSAPP_TEMPLATE_CONFIRM',
-    [b.name, b.trek_name, b.travellers, b.travel_date || 'to be confirmed', inr(b.advance_paid), inr(b.balance_due)]);
-}
-
 // ---- Auth helpers (Supabase JWT from the browser) ----
 async function getUser(event) {
   const h = event.headers.authorization || event.headers.Authorization || '';
@@ -268,7 +241,7 @@ async function confirmBooking(orderId, paymentId) {
   }
   b = updated[0];
   // Each step is isolated: a failure in one never blocks the booking or the others.
-  for (const step of [sendConfirmationEmail, whatsappConfirmation, appendToSheet, notifyTeam]) {
+  for (const step of [sendConfirmationEmail, appendToSheet, notifyTeam]) {
     try { await step(b); } catch (e) { console.error(step.name + ' failed', e); }
   }
   return { booking: b, alreadyConfirmed: false };
@@ -277,5 +250,5 @@ async function confirmBooking(orderId, paymentId) {
 module.exports = {
   DATA, ADVANCE_PER_PERSON, env, json, sb, rzCreateOrder, verifyCheckoutSignature,
   timingSafeEqualHex, confirmBooking, sendConfirmationEmail, crypto,
-  sendMail, wrapMail, esc, inr, teamList, sendWhatsApp, getUser, requireAdmin, confirmBalance,
+  sendMail, wrapMail, esc, inr, teamList, getUser, requireAdmin, confirmBalance,
 };

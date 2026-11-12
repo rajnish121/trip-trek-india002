@@ -1,5 +1,5 @@
 // Runs daily (see netlify.toml). Sends a reminder 7 days and 1 day before the travel date, once each.
-const { sb, sendMail, wrapMail, esc, inr, sendWhatsApp } = require('./_lib');
+const { sb, sendMail, wrapMail, esc, inr } = require('./_lib');
 
 const ist = () => new Date(Date.now() + 5.5 * 3600 * 1000);
 const dayNum = (iso) => Math.floor(Date.parse(iso + 'T00:00:00Z') / 86400000);
@@ -24,7 +24,6 @@ exports.handler = async () => {
         html: wrapMail(left === 1 ? 'Your trip starts tomorrow!' : 'One week to go!',
           `<p>Hi ${esc(b.name)}, your <b>${esc(b.trek_name)}</b> is on <b>${esc(b.travel_date)}</b>.</p>${bal}<p>Download your itinerary and packing list from <a href="${site}/account/">My Account</a>. Our team will share reporting details on WhatsApp. Questions? +91 93109 65771.</p>`),
       });
-      await sendWhatsApp(b.phone, 'WHATSAPP_TEMPLATE_REMINDER', [b.name, b.trek_name, b.travel_date, left === 1 ? 'tomorrow' : 'in 7 days']).catch(() => {});
       done[key] = new Date().toISOString();
       await sb('bookings?id=eq.' + b.id, { method: 'PATCH', body: { reminders_sent: done }, prefer: 'return=minimal' });
       sent++;
