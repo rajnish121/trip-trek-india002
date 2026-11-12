@@ -145,6 +145,29 @@
     .hero-photo{order:-1;}
     .hero-photo::before{inset:12px -8px -12px 8px;}
   }
+
+  .hero-copy{position:relative;z-index:6;min-width:0;}
+  .tsearch{position:relative;margin-top:28px;max-width:640px;width:100%;}
+  .tsearch-bar{display:flex;align-items:center;gap:10px;background:#f3f3f3;border-radius:999px;padding:6px 6px 6px 20px;box-shadow:0 14px 34px -14px rgba(0,0,0,.55);}
+  .tsearch-bar svg{flex:none;color:#6b7686;}
+  .tsearch-bar input{flex:1;min-width:0;width:100%;border:none;background:transparent;font:inherit;font-size:16px;color:#1b2430;padding:13px 4px;outline:none;}
+  .tsearch-bar input::placeholder{color:#6b7686;}
+  .tsearch-bar button{flex:none;border:none;cursor:pointer;background:var(--blue);color:#fff;font:inherit;font-size:15px;font-weight:600;padding:13px 26px;border-radius:999px;}
+  .tsearch-bar button:hover{background:var(--navy);}
+  .tsearch-list{position:absolute;left:0;right:0;top:calc(100% + 8px);background:#fff;border-radius:18px;box-shadow:0 22px 50px -16px rgba(0,0,0,.5);padding:6px;max-height:340px;overflow:auto;z-index:20;}
+  .tsearch-list[hidden]{display:none;}
+  .tsearch-list a{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;color:#1b2430;text-decoration:none;}
+  .tsearch-list a:hover,.tsearch-list a:focus{background:#eef3fb;outline:none;}
+  .tsearch-list b{display:block;font-size:15px;color:var(--navy);}
+  .tsearch-list small{display:block;font-size:12.5px;color:#6b7686;margin-top:2px;}
+  .tsearch-list em{font-style:normal;font-size:13px;font-weight:600;color:var(--orange);white-space:nowrap;}
+  .tsearch-none{padding:14px;font-size:14.5px;color:#3d4757;line-height:1.55;}
+  .tsearch-none a{display:inline;padding:0;color:var(--blue);font-weight:600;text-decoration:underline;}
+  .search-status{margin:22px 0 -26px;padding:14px 18px;background:#eef3fb;border:1px solid #d6e2f5;border-radius:14px;font-size:15px;color:var(--navy);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;}
+  .search-status[hidden]{display:none;}
+  .search-status button{border:none;background:none;color:var(--orange);font:inherit;font-weight:600;cursor:pointer;text-decoration:underline;}
+  .search-status a{color:var(--blue);font-weight:600;}
+  @media (max-width:560px){.tsearch-bar{padding-left:16px}.tsearch-bar button{padding:12px 18px}}
 </style>
 <!--seo-->
 <link rel="canonical" href="https://triptrekindia.in/">
@@ -196,9 +219,17 @@
       <span class="eyebrow">FROM PLANS TO PARADISE</span>
       <h1>The moment you step into the mountains, <em>strangers become family.</em></h1>
       <p class="sub">Himalayan treks, group departures &amp; pilgrimage circuits across Uttarakhand and Himachal Pradesh — Delhi to Delhi, with an experienced Trip Captain by your side.</p>
+      <form class="tsearch" id="tripSearch" role="search" autocomplete="off">
+        <div class="tsearch-bar">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input id="tripSearchInput" type="search" placeholder="Search trips, destinations or experiences…" aria-label="Search trips, destinations or experiences" aria-controls="tripSearchList" enterkeyhint="search">
+          <button type="submit">Search</button>
+        </div>
+        <div class="tsearch-list" id="tripSearchList" role="listbox" hidden></div>
+      </form>
       <div class="hero-ctas">
-        <a href="#treks" class="btn btn-primary">Explore Treks</a>
-        <a href="https://wa.me/919310965771" class="btn btn-ghost" target="_blank" rel="noopener">WhatsApp Us</a>
+        <a href="#treks" class="btn btn-primary">Explore Trips &rarr;</a>
+        <a href="upcoming-trips.html" class="btn btn-ghost">View Upcoming Departures</a>
       </div>
     </div>
     <figure class="hero-photo">
@@ -213,7 +244,8 @@
     <span class="tag">OUR TREKS</span>
     <h2 class="h2">Choose Your Himalayan Getaway</h2>
     <div class="h2-rule"></div>
-    <p class="lede">Nine curated departures across Uttarakhand and Himachal Pradesh — pick one and view the full day-by-day itinerary.</p>
+    <p class="lede">Twelve curated departures across Uttarakhand, Himachal Pradesh and Rajasthan — pick one and view the full day-by-day itinerary.</p>
+    <div class="search-status" id="searchStatus" hidden></div>
     <div class="trek-grid">
 
       <a class="trek-card is-closed" href="yulla-kanda/index.html">
@@ -454,5 +486,81 @@
   });
 </script>
 
+<script>
+(function(){
+  var form=document.getElementById('tripSearch'); if(!form) return;
+  var input=document.getElementById('tripSearchInput'), list=document.getElementById('tripSearchList'), status=document.getElementById('searchStatus');
+  var grid=document.querySelector('#treks .trek-grid'); if(!grid) return;
+  var EXTRA={'chakrata':'weekend tiger falls moila top dehradun','kanatal-tehri':'weekend lake water sports surkanda devi','mcleodganj-triund':'dharamshala dharamsala tibetan summit','manali-kasol':'atal tunnel sissu parvati','jibhi-tirthan-valley':'tirthan himachal mini thailand','kedarnath-yatra':'kedar shiva jyotirlinga char dham pilgrimage','madhyamaheshwar':'madmaheshwar panch kedar pilgrimage','rudranath':'panch kedar pilgrimage','yulla-kanda':'krishna temple','udaipur-mount-abu':'mount abu rajasthan lakes city palace','chitkul-kalpa':'kinnaur sangla last village india','chopta-tungnath-chandrashila':'mini switzerland tungnath chandrashila shiva temple'};
+  var STOP={trip:1,trips:1,trek:1,treks:1,tour:1,tours:1,to:1,in:1,from:1,the:1,a:1,for:1,price:1,rs:1,inr:1,best:1,delhi:1};
+  function norm(t){return (t||'').toLowerCase().replace(/&amp;/g,' ').replace(/[^a-z0-9\u20b9]+/g,' ').trim();}
+  var items=[].slice.call(grid.querySelectorAll('.trek-card')).map(function(c){
+    var href=c.getAttribute('href'), slug=href.split('/')[0];
+    var q=function(sel){var e=c.querySelector(sel);return e?e.textContent.trim():'';};
+    var tag=q('.trek-tag'), title=q('.trek-title'), chip=q('.trek-chip');
+    var m=c.textContent.match(/\u20b9\s*([\d,]+)/), price=m?parseInt(m[1].replace(/,/g,''),10):0;
+    var closed=c.classList.contains('is-closed'), rib=q('.closed-ribbon');
+    var weekend=/(2D\/1N|1N\/2D)/i.test(tag)?' weekend short':'';
+    return {el:c,href:href,title:title,tag:tag.replace(/^CLOSED[^A-Z]*/,''),price:price,closed:closed,label:closed?rib.replace(/^CLOSED\s*\W*\s*/i,''):'',hay:norm([tag,title,chip,EXTRA[slug]||'',weekend,closed?'closed':''].join(' '))};
+  });
+  function parse(q){
+    var max=0, s=q.toLowerCase();
+    var m=s.match(/(?:under|below|less than|upto|up to|within|<)\s*\u20b9?\s*(\d[\d,]*)\s*(k)?/);
+    if(m){max=parseInt(m[1].replace(/,/g,''),10); if(m[2]) max*=1000; if(max<100) max*=1000; s=s.replace(m[0],' ');}
+    var toks=norm(s).split(' ').filter(function(t){return t&&!STOP[t];});
+    return {toks:toks,max:max};
+  }
+  function find(q){
+    var p=parse(q); if(!p.toks.length && !p.max) return [];
+    return items.filter(function(it){
+      if(p.max && it.price>p.max) return false;
+      return p.toks.every(function(t){return it.hay.indexOf(t)>-1;});
+    });
+  }
+  function wa(q){return 'https://wa.me/919310965771?text='+encodeURIComponent('Hi Trip Trek India, I am looking for: '+q);}
+  function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+  function show(q){
+    var r=find(q);
+    if(!q.trim()){list.hidden=true;list.innerHTML='';return r;}
+    if(!r.length){
+      list.innerHTML='<div class="tsearch-none">No trip matches &ldquo;'+esc(q)+'&rdquo;. <a href="'+wa(q)+'" target="_blank" rel="noopener">Ask us on WhatsApp</a> and we will help you find one.</div>';
+    }else{
+      list.innerHTML=r.slice(0,6).map(function(it){
+        return '<a href="'+it.href+'" role="option"><span><b>'+esc(it.title)+'</b><small>'+esc(it.tag)+'</small></span><em>'+(it.closed?esc(it.label||'Closed'):'from \u20b9'+it.price.toLocaleString('en-IN'))+'</em></a>';
+      }).join('');
+    }
+    list.hidden=false; return r;
+  }
+  function clearFilter(){
+    items.forEach(function(it){it.el.style.display='';});
+    status.hidden=true; status.innerHTML='';
+  }
+  function applyFilter(q){
+    var r=find(q); list.hidden=true;
+    if(r.length===1){window.location.href=r[0].href;return;}
+    items.forEach(function(it){it.el.style.display=r.indexOf(it)>-1?'':'none';});
+    status.hidden=false;
+    status.innerHTML=r.length
+      ? '<span>Showing '+r.length+' trips for &ldquo;'+esc(q)+'&rdquo;</span><button type="button" id="searchClear">Show all trips</button>'
+      : '<span>No trip matches &ldquo;'+esc(q)+'&rdquo;. <a href="'+wa(q)+'" target="_blank" rel="noopener">Ask us on WhatsApp</a></span><button type="button" id="searchClear">Show all trips</button>';
+    document.getElementById('searchClear').onclick=function(){clearFilter();input.value='';};
+    document.getElementById('treks').scrollIntoView({behavior:'smooth'});
+  }
+  input.addEventListener('input',function(){clearFilter();show(input.value);});
+  input.addEventListener('focus',function(){if(input.value.trim()) show(input.value);});
+  input.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){list.hidden=true;}
+    if(e.key==='ArrowDown'){var a=list.querySelector('a'); if(a){e.preventDefault();a.focus();}}
+  });
+  list.addEventListener('keydown',function(e){
+    var a=document.activeElement;
+    if(e.key==='ArrowDown'&&a.nextElementSibling){e.preventDefault();a.nextElementSibling.focus();}
+    if(e.key==='ArrowUp'){e.preventDefault(); if(a.previousElementSibling) a.previousElementSibling.focus(); else input.focus();}
+    if(e.key==='Escape'){list.hidden=true;input.focus();}
+  });
+  form.addEventListener('submit',function(e){e.preventDefault(); if(!input.value.trim()){clearFilter();return;} applyFilter(input.value);});
+  document.addEventListener('click',function(e){if(!form.contains(e.target)) list.hidden=true;});
+})();
+</script>
 </body>
 </html>
