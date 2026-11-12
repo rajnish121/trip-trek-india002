@@ -154,6 +154,94 @@ async function notifyTeam(b) {
   if (!res.ok) console.error('Team email error', res.status, await res.text());
 }
 
+// ---- Generic email ----
+async function sendMail({ to, subject, html, bcc, reply_to }) {
+  if (!process.env.RESEND_API_KEY) return { skipped: true };
+  const from = process.env.EMAIL_FROM || 'Trip Trek India <bookings@triptrekindia.in>';
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + env('RESEND_API_KEY'), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ from, to: Array.isArray(to) ? to : [to], bcc, reply_to, subject, html }),
+  });
+  if (!res.ok) console.error('Resend error', res.status, await res.text());
+  return { ok: res.ok };
+}
+const teamList = () => (process.env.TEAM_EMAIL || '').split(',').map((x) => x.trim()).filter(Boolean);
+const wrapMail = (title, inner) => `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:auto;color:#13243C">
+  <div style="background:#043C87;color:#fff;padding:18px 24px;border-radius:10px 10px 0 0"><div style="font-size:19px;font-weight:700">${title}</div><div style="opacity:.85;font-size:13px">Trip Trek India</div></div>
+  <div style="border:1px solid #e3e8ef;border-top:0;padding:22px 24px;border-radius:0 0 10px 10px;font-size:14px;line-height:1.6">${inner}</div></div>`;
+
+// ---- WhatsApp (Meta Cloud API, template messages). Skipped unless configured. ----
+// Templates take positional {{1}}, {{2}}... text parameters.
+async function sendWhatsApp(phone10, templateEnvKey, params) {
+  const token = process.env.WHATSAPP_TOKEN, id = process.env.WHATSAPP_PHONE_ID, tpl = process.env[templateEnvKey];
+  if (!token || !id || !tpl || !phone10) return { skipped: true };
+  const res = await fetch('https://graph.facebook.com/v20.0/' + id + '/messages', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to: '91' + String(phone10).replace(/\D/g, '').slice(-10),
+      type: 'template',
+      template: {
+        name: tpl,
+        language: { code: process.env.WHATSAPP_LANG || 'en' },
+        components: [{ type: 'body', parameters: params.map((t) => ({ type: 'text', text: String(t) })) }],
+      },
+    }),
+  });
+  if (!res.ok) console.error('WhatsApp error', res.status, await res.text());
+  return { ok: res.ok };
+}
+async function whatsappConfirmation(b) {
+  return sendWhatsApp(b.phone, 'WHATSAPP_TEMPLATE_CONFIRM',
+    [b.name, b.trek_name, b.travellers, b.travel_date || 'to be confirmed', inr(b.advance_paid), inr(b.balance_due)]);
+}
+
+// ---- Auth helpers (Supabase JWT from the browser) ----
+async function getUser(event) {
+  const h = event.headers.authorization || event.headers.Authorization || '';
+  const jwt = h.replace(/^Bearer\s+/i, '');
+  if (!jwt) return null;
+  const res = await fetch(env('SUPABASE_URL').replace(/\/$/, '') + '/auth/v1/user', {
+    headers: { apikey: env('SUPABASE_ANON_KEY'), Authorization: 'Bearer ' + jwt },
+  });
+  if (!res.ok) return null;
+  const u = await res.json();
+  return u && u.email ? { email: String(u.email).toLowerCase(), id: u.id } : null;
+}
+async function requireAdmin(event) {
+  const u = await getUser(event);
+  const admins = (process.env.ADMIN_EMAILS || '').toLowerCase().split(',').map((x) => x.trim()).filter(Boolean);
+  return u && admins.includes(u.email) ? u : null;
+}
+
+// Mark the balance paid (idempotent). Used by verify-balance-payment AND the webhook.
+async function confirmBalance(orderId, paymentId) {
+  const rows = await sb('bookings?balance_order_id=eq.' + encodeURIComponent(orderId) + '&select=*');
+  if (!rows || !rows.length) return null;
+  let b = rows[0];
+  if (b.balance_paid_at) return { booking: b, already: true };
+  const amount = b.balance_due;
+  const upd = await sb('bookings?id=eq.' + b.id + '&balance_paid_at=is.null', {
+    method: 'PATCH',
+    body: { balance_paid_at: new Date().toISOString(), balance_paid_amount: amount, balance_payment_id: paymentId, balance_due: 0 },
+  });
+  if (!upd || !upd.length) return { booking: (await sb('bookings?id=eq.' + b.id + '&select=*'))[0], already: true };
+  b = upd[0];
+  try {
+    await sendMail({
+      to: b.email, bcc: process.env.EMAIL_BCC ? [process.env.EMAIL_BCC] : undefined,
+      subject: 'Payment received — ' + b.trek_name + ' | Trip Trek India',
+      html: wrapMail('Full payment received ✅', `<p>Hi ${esc(b.name)},</p><p>We've received your balance payment of <b>${inr(amount)}</b> for <b>${esc(b.trek_name)}</b>. Your trip is now fully paid — nothing more to pay at onboarding.</p><p>Download your receipt anytime from <a href="${process.env.SITE_URL || 'https://triptrekindia.in'}/account/">My Account</a>.</p>`),
+    });
+  } catch (e) { console.error('balance email failed', e); }
+  try {
+    if (teamList().length) await sendMail({ to: teamList(), reply_to: b.email, subject: 'Balance paid: ' + b.name + ' — ' + b.trek_name + ' (' + inr(amount) + ')', html: wrapMail('Balance received', `<p><b>${esc(b.name)}</b> · ${esc(b.phone)}<br>${esc(b.trek_name)} · ${inr(amount)} paid online. Payment ID ${esc(paymentId)}</p>`) });
+  } catch (e) { console.error('team balance email failed', e); }
+  return { booking: b, already: false };
+}
+
 // Mark a booking paid (idempotent). Used by verify-payment AND the webhook.
 async function confirmBooking(orderId, paymentId) {
   const rows = await sb('bookings?razorpay_order_id=eq.' + encodeURIComponent(orderId) + '&select=*');
@@ -180,7 +268,7 @@ async function confirmBooking(orderId, paymentId) {
   }
   b = updated[0];
   // Each step is isolated: a failure in one never blocks the booking or the others.
-  for (const step of [sendConfirmationEmail, appendToSheet, notifyTeam]) {
+  for (const step of [sendConfirmationEmail, whatsappConfirmation, appendToSheet, notifyTeam]) {
     try { await step(b); } catch (e) { console.error(step.name + ' failed', e); }
   }
   return { booking: b, alreadyConfirmed: false };
@@ -189,4 +277,5 @@ async function confirmBooking(orderId, paymentId) {
 module.exports = {
   DATA, ADVANCE_PER_PERSON, env, json, sb, rzCreateOrder, verifyCheckoutSignature,
   timingSafeEqualHex, confirmBooking, sendConfirmationEmail, crypto,
+  sendMail, wrapMail, esc, inr, teamList, sendWhatsApp, getUser, requireAdmin, confirmBalance,
 };

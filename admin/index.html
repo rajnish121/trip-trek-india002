@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Team Admin | Trip Trek India</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.ico?v=3" sizes="48x48">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#043C87;--blue:#2A6BC5;--orange:#EF3006;--ink:#13243C;--grey:#5A6B80;--line:#E3E8EF;--green:#1E8E5A;--bg:#F4F7FB}
+*{box-sizing:border-box}body{margin:0;font-family:Poppins,Arial,sans-serif;color:var(--ink);background:var(--bg);font-size:14px}
+header{background:var(--navy);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center}
+header b{font-size:16px}header button{background:rgba(255,255,255,.15);color:#fff;border:0;border-radius:8px;padding:7px 12px;font:600 13px Poppins;cursor:pointer}
+main{max-width:1200px;margin:20px auto;padding:0 14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px}
+input,select,textarea{padding:9px 11px;border:1px solid #cfd8e6;border-radius:9px;font:400 14px Poppins;max-width:100%}
+.btn{padding:9px 14px;border:0;border-radius:9px;background:var(--orange);color:#fff;font:600 13px Poppins;cursor:pointer}
+.btn.alt{background:#fff;color:var(--navy);border:1px solid var(--line)}.btn.red{background:#B42318}.btn[disabled]{opacity:.6}
+.hidden{display:none}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}.stat small{color:var(--grey);display:block}.stat b{font-size:22px;color:var(--navy)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0;align-items:center}.bar input{flex:1;min-width:180px}
+.tabs button{padding:9px 16px;border:1px solid var(--line);background:#fff;border-radius:9px;font:600 13px Poppins;cursor:pointer;color:var(--grey);margin-right:6px}.tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.wrap{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;min-width:820px}th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}th{background:#f8fafd;color:var(--grey);font-size:12px;text-transform:uppercase}
+tr.row{cursor:pointer}tr.row:hover{background:#f8fafd}
+.b{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}.b.confirmed{background:#E8F6EF;color:var(--green)}.b.pending{background:#FFF4E0;color:#B26A00}.b.cancelled{background:#eee;color:#666}.b.flag{background:#FDECEA;color:#B42318}
+.det td{background:#fafcff}.det .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}.det textarea{width:100%;min-height:70px}
+.det .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.msg{margin:10px 0;padding:10px 12px;border-radius:8px;background:#FDECEA;color:#B42318;display:none}.msg.ok{background:#E8F6EF;color:var(--green)}
+label{font-weight:600;font-size:13px;display:block;margin:10px 0 5px}
+</style></head><body>
+<header><b>Trip Trek India · Team Admin</b><span><span id="who" style="opacity:.8;margin-right:10px"></span><button id="out" class="hidden">Log out</button></span></header>
+<main>
+<div class="card hidden" id="login" style="max-width:420px;margin:60px auto">
+  <h2 style="margin-top:0;color:var(--navy)">Team login</h2>
+  <div id="s1"><label>Work email</label><input id="em" type="email" style="width:100%" placeholder="you@triptrekindia.in"><p><button class="btn" id="send" style="width:100%">Send login code</button></p></div>
+  <div id="s2" class="hidden"><label>Code from your email</label><input id="otp" inputmode="numeric" maxlength="8" style="width:100%;letter-spacing:6px;text-align:center;font-size:20px"><p><button class="btn" id="ver" style="width:100%">Verify</button></p></div>
+</div>
+<div class="msg" id="msg"></div>
+<div id="app" class="hidden">
+  <div class="stats" id="stats"></div>
+  <div class="tabs"><button class="on" data-t="b">Bookings</button><button data-t="r">Requests <span id="rc"></span></button><button data-t="s">Subscribers</button></div>
+  <div class="bar" id="bar">
+    <input id="q" placeholder="Search name, phone, email, trip…">
+    <select id="fs"><option value="">All status</option><option>confirmed</option><option>pending</option><option>cancelled</option></select>
+    <select id="ft"><option value="">All trips</option></select>
+    <select id="fb"><option value="">Balance: any</option><option value="due">Balance due</option><option value="paid">Fully paid</option></select>
+    <button class="btn alt" id="csv">Export CSV</button><button class="btn alt" id="ref">Refresh</button>
+  </div>
+  <div class="wrap"><table><thead id="th"></thead><tbody id="tb"></tbody></table></div>
+</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+(async function(){
+var $=function(i){return document.getElementById(i)},sb,B=[],S=[],T={},tab='b',open=null;
+var inr=function(n){return '₹'+Number(n||0).toLocaleString('en-IN')};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+function say(t,ok){var m=$('msg');m.textContent=t||'';m.className='msg'+(ok?' ok':'');m.style.display=t?'block':'none'}
+var cfg=await (await fetch('/.netlify/functions/public-config')).json();
+sb=supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey);
+async function api(action,extra){
+  var s=await sb.auth.getSession();var r=await fetch('/.netlify/functions/admin',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+(s.data.session&&s.data.session.access_token)},body:JSON.stringify(Object.assign({action:action},extra||{}))});
+  var d=await r.json().catch(function(){return{}});if(!r.ok){var e=new Error(d.error||'Error');e.status=r.status;throw e}return d}
+$('send').onclick=async function(){var e=$('em').value.trim().toLowerCase();if(!e)return;this.disabled=true;
+  var r=await sb.auth.signInWithOtp({email:e,options:{shouldCreateUser:true}});this.disabled=false;
+  if(r.error)return say('Could not send code: '+r.error.message);say('');$('s1').classList.add('hidden');$('s2').classList.remove('hidden');$('send').dataset.e=e};
+$('ver').onclick=async function(){var r=await sb.auth.verifyOtp({email:$('send').dataset.e,token:$('otp').value.trim(),type:'email'});
+  if(r.error)return say('Wrong or expired code.');say('');start(r.data.user)};
+$('out').onclick=async function(){await sb.auth.signOut();location.reload()};
+async function start(u){
+  $('login').classList.add('hidden');$('who').textContent=u.email;$('out').classList.remove('hidden');
+  try{await load()}catch(e){$('app').classList.add('hidden');if(e.status===403)say('This email is not an authorised team member. Ask the owner to add it to ADMIN_EMAILS.');else say(e.message);return}
+  $('app').classList.remove('hidden')}
+async function load(){var d=await api('bookings');B=d.bookings||[];T=d.trips||{};
+  if($('ft').options.length<2)Object.keys(T).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=T[k];$('ft').appendChild(o)});
+  if(tab==='s'){S=(await api('subscribers')).subscribers||[]}draw()}
+function stats(){var c=B.filter(function(b){return b.status==='confirmed'});
+  var adv=0,bal=0,due=0,tr=0;c.forEach(function(b){adv+=b.advance_paid||0;bal+=b.balance_paid_amount||0;due+=b.balance_due||0;tr+=b.travellers||0});
+  var rq=B.filter(function(b){return b.cancel_requested_at}).length;$('rc').textContent=rq?'('+rq+')':'';
+  var h=[['Confirmed bookings',c.length],['Travellers',tr],['Collected',inr(adv+bal)],['Balance pending',inr(due)],['Open requests',rq]];
+  $('stats').innerHTML=h.map(function(x){return'<div class="stat"><small>'+x[0]+'</small><b>'+x[1]+'</b></div>'}).join('')}
+function filt(){var q=$('q').value.toLowerCase(),fs=$('fs').value,ft=$('ft').value,fb=$('fb').value;
+  return B.filter(function(b){
+    if(tab==='r'&&!b.cancel_requested_at)return false;
+    if(fs&&b.status!==fs)return false;if(ft&&b.trek!==ft)return false;
+    if(fb==='due'&&!(b.status==='confirmed'&&b.balance_due>0))return false;if(fb==='paid'&&!(b.status==='confirmed'&&!(b.balance_due>0)))return false;
+    return !q||[b.name,b.phone,b.email,b.trek_name].join(' ').toLowerCase().indexOf(q)>-1})}
+function draw(){stats();
+  $('bar').querySelectorAll('select').forEach(function(x){x.style.display=tab==='s'?'none':''});
+  if(tab==='s'){$('th').innerHTML='<tr><th>Email</th><th>Name</th><th>Source</th><th>Joined</th><th>Status</th></tr>';
+    var q=$('q').value.toLowerCase();$('tb').innerHTML=S.filter(function(s){return!q||(s.email+' '+(s.name||'')).toLowerCase().indexOf(q)>-1}).map(function(s){return'<tr><td>'+esc(s.email)+'</td><td>'+esc(s.name||'')+'</td><td>'+esc(s.source||'')+'</td><td>'+new Date(s.created_at).toLocaleDateString('en-IN')+'</td><td>'+(s.unsubscribed_at?'<span class="b cancelled">unsubscribed</span>':'<span class="b confirmed">active</span>')+'</td></tr>'}).join('')||'<tr><td colspan="5">No subscribers yet.</td></tr>';return}
+  $('th').innerHTML='<tr><th>Booked</th><th>Customer</th><th>Trip</th><th>Travel</th><th>Paid</th><th>Balance</th><th>Status</th></tr>';
+  var rows=filt();$('tb').innerHTML=rows.map(function(b){
+    var d=new Date(b.confirmed_at||b.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
+    var r='<tr class="row" data-id="'+b.id+'"><td>'+d+'</td><td><b>'+esc(b.name)+'</b><br><small>'+esc(b.phone)+'</small></td><td>'+esc(b.trek_name)+'<br><small>'+esc(b.travellers)+' · '+esc(b.sharing)+'</small></td><td>'+esc(b.travel_date||'TBC')+'</td><td>'+inr((b.advance_paid||0)+(b.balance_paid_amount||0))+'</td><td>'+(b.status==='confirmed'?(b.balance_due>0?inr(b.balance_due):'<span class="b confirmed">paid</span>'):'—')+'</td><td><span class="b '+b.status+'">'+b.status+'</span>'+(b.cancel_requested_at?' <span class="b flag">request</span>':'')+'</td></tr>';
+    if(open===b.id){var wa='https://wa.me/91'+String(b.phone).slice(-10)+'?text='+encodeURIComponent('Hi '+b.name+', this is Trip Trek India regarding your '+b.trek_name+' booking. ');
+      r+='<tr class="det"><td colspan="7"><div class="g"><div><b>Contact</b><br>'+esc(b.email)+'<br>+91 '+esc(b.phone)+'<br><small>Order '+esc(b.razorpay_order_id)+'<br>Payment '+esc(b.razorpay_payment_id||'—')+'</small>'
+      +(b.cancel_reason?'<p style="color:#B42318"><b>Customer request:</b><br>'+esc(b.cancel_reason)+'</p>':'')+'</div>'
+      +'<div><label>Travel date</label><input type="date" id="dt" value="'+esc(b.travel_date||'')+'"><label>Internal notes</label><textarea id="nt">'+esc(b.admin_notes||'')+'</textarea></div></div>'
+      +'<div class="acts"><button class="btn" data-a="save">Save</button><a class="btn alt" target="_blank" href="'+wa+'" style="text-decoration:none">WhatsApp</a>'
+      +(b.status==='confirmed'?'<button class="btn alt" data-a="resend">Resend confirmation</button>':'')
+      +(b.status==='confirmed'&&b.balance_due>0?'<button class="btn alt" data-a="offline">Mark balance received (cash/UPI)</button>':'')
+      +(b.cancel_requested_at?'<button class="btn alt" data-a="clear">Clear request</button>':'')
+      +(b.status==='confirmed'?'<button class="btn red" data-a="cancel">Mark cancelled</button>':'')+(b.status==='cancelled'?'<button class="btn alt" data-a="restore">Restore</button>':'')+'</div></td></tr>'}
+    return r}).join('')||'<tr><td colspan="7">Nothing found.</td></tr>'}
+$('tb').onclick=async function(e){
+  var btn=e.target.closest('[data-a]');var row=e.target.closest('tr.row');
+  if(row&&!btn){open=open===row.dataset.id?null:row.dataset.id;return draw()}
+  if(!btn)return;var b=B.filter(function(x){return x.id===open})[0];if(!b)return;var a=btn.dataset.a;btn.disabled=true;
+  try{
+    if(a==='save')await api('update',{id:b.id,fields:{admin_notes:$('nt').value,travel_date:$('dt').value||null}});
+    if(a==='resend'){await api('resend',{id:b.id,whatsapp:confirm('Also send the WhatsApp message?')});say('Sent.',1);btn.disabled=false;return}
+    if(a==='offline'){if(!confirm('Record the full balance as received offline?'))return btn.disabled=false;await api('update',{id:b.id,fields:{balance_received_offline:true}})}
+    if(a==='clear')await api('update',{id:b.id,fields:{clear_request:true}});
+    if(a==='cancel'){if(!confirm('Mark this booking cancelled? (Refund is not processed automatically.)'))return btn.disabled=false;await api('update',{id:b.id,fields:{status:'cancelled'}})}
+    if(a==='restore')await api('update',{id:b.id,fields:{status:'confirmed'}});
+    say('Saved.',1);await load()}catch(err){say(err.message)}};
+document.querySelectorAll('.tabs button').forEach(function(t){t.onclick=async function(){document.querySelectorAll('.tabs button').forEach(function(x){x.classList.remove('on')});t.classList.add('on');tab=t.dataset.t;open=null;if(tab==='s'&&!S.length)S=(await api('subscribers')).subscribers||[];draw()}});
+['q','fs','ft','fb'].forEach(function(i){$(i).oninput=draw});$('ref').onclick=function(){load().then(function(){say('Refreshed.',1)}).catch(function(e){say(e.message)})};
+$('csv').onclick=function(){var rows=tab==='s'?S.map(function(s){return[s.email,s.name,s.source,s.created_at,s.unsubscribed_at]}):filt().map(function(b){return[b.created_at,b.name,b.phone,b.email,b.trek_name,b.sharing,b.travellers,b.travel_date,b.total_amount,b.advance_paid,b.balance_paid_amount,b.balance_due,b.status]});
+  var h=tab==='s'?['email','name','source','joined','unsubscribed']:['booked','name','phone','email','trip','sharing','travellers','travel_date','total','advance_paid','balance_paid','balance_due','status'];
+  var c=[h].concat(rows).map(function(r){return r.map(function(v){return'"'+String(v==null?'':v).replace(/"/g,'""')+'"'}).join(',')}).join('\n');
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:'text/csv'}));a.download='tti-'+(tab==='s'?'subscribers':'bookings')+'.csv';a.click()};
+var ss=await sb.auth.getSession();if(ss.data.session)start(ss.data.session.user);else $('login').classList.remove('hidden');
+})();
+</script></body></html>

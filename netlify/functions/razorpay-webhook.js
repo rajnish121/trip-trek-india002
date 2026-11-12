@@ -1,5 +1,5 @@
 // Backup path: confirms the booking even if the customer closes the tab after paying.
-const { env, json, crypto, timingSafeEqualHex, confirmBooking } = require('./_lib');
+const { env, json, crypto, timingSafeEqualHex, confirmBooking, confirmBalance } = require('./_lib');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'POST only' });
@@ -11,7 +11,11 @@ exports.handler = async (event) => {
     const payload = JSON.parse(event.body);
     if (payload.event === 'payment.captured' || payload.event === 'order.paid') {
       const pay = payload.payload.payment && payload.payload.payment.entity;
-      if (pay && pay.order_id) await confirmBooking(pay.order_id, pay.id);
+      if (pay && pay.order_id) {
+        // A balance order matches balance_order_id; anything else is an advance payment.
+        const handled = await confirmBalance(pay.order_id, pay.id);
+        if (!handled) await confirmBooking(pay.order_id, pay.id);
+      }
     }
     return json(200, { ok: true });
   } catch (e) {

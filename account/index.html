@@ -44,6 +44,13 @@
   .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 16px;margin-top:12px;font-size:13px;color:var(--grey)}
   .grid b{color:var(--ink);display:block;font-size:14px}
   .empty{color:var(--grey);font-size:14px}
+  .badge.paid{background:#E8F6EF;color:var(--green)} .badge.req{background:#FDECEA;color:#B42318} .badge.cancelled{background:#eee;color:#666}
+  .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .acts button,.acts a{padding:9px 14px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--navy);font:600 13px Poppins;cursor:pointer;text-decoration:none}
+  .acts .pay{background:var(--orange);border-color:var(--orange);color:#fff}
+  .req-box{margin-top:12px;display:none} .req-box textarea{width:100%;padding:10px;border:1px solid #cfd8e6;border-radius:10px;font:400 14px Poppins;min-height:70px}
+  .req-box select{padding:9px;border-radius:9px;border:1px solid #cfd8e6;font:400 14px Poppins;margin-bottom:8px}
+  .note{font-size:12px;color:var(--grey);margin-top:10px}
   @media(max-width:520px){.profile{grid-template-columns:1fr}}
 </style>
 <link rel="icon" href="/favicon.ico?v=3" sizes="48x48">
@@ -93,12 +100,14 @@
       <div>Email<b id="pEmail"></b></div>
       <div>Mobile<b id="pPhone">—</b></div>
     </div>
+    <div class="msg" id="msg2"></div>
     <h2>My bookings</h2>
     <div id="bookings"><p class="empty">Loading…</p></div>
     <button class="link" id="logout" type="button">Log out</button>
   </div>
 </main>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 (async function(){
@@ -107,7 +116,7 @@
   var inr = function(n){return '₹' + Number(n||0).toLocaleString('en-IN')};
   var esc = function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
 
-  function say(t, kind){ var m=$('msg'); m.className='msg '+(kind||'err'); m.textContent=t; if(!t) m.className='msg'; }
+  function say(t, kind){ var m=$($('dash').classList.contains('hidden')?'msg':'msg2'); m.className='msg '+(kind||'err'); m.textContent=t; if(!t) m.className='msg'; }
 
   try {
     var cfg = await (await fetch('/.netlify/functions/public-config')).json();
@@ -176,24 +185,86 @@
       $('bEmail').textContent = email;
       $('bPhone').textContent = phone ? ' and mobile +91 ' + phone : '';
     }
-    var box = $('bookings');
-    var shown = rows.filter(function(b){return b.status==='confirmed'});
-    var pend = rows.filter(function(b){return b.status==='pending'});
-    if(!shown.length && !pend.length){ box.innerHTML = '<p class="empty">No bookings yet. Pick a trip and reserve your seat — it will show up here.</p>'; return; }
-    box.innerHTML = shown.concat(pend).map(function(b){
-      var ok = b.status==='confirmed';
-      return '<div class="bk"><div class="top"><h3>'+esc(b.trek_name||b.trek)+'</h3>'
-        + '<span class="badge '+(ok?'confirmed':'pending')+'">'+(ok?'Booking Confirmed':'Payment pending')+'</span></div>'
+    window.__rows = rows;
+    render();
+  }
+
+  function render(){
+    var box = $('bookings'), rows = window.__rows || [];
+    var order = {confirmed:0,pending:1};
+    if(!rows.length){ box.innerHTML = '<p class="empty">No bookings yet. Pick a trip and reserve your seat — it will show up here.</p>'; return; }
+    box.innerHTML = rows.slice().sort(function(a,b){return order[a.status]-order[b.status]}).map(function(b){
+      var ok = b.status==='confirmed', paidFull = ok && !(b.balance_due>0);
+      var badge = !ok ? ['pending','Payment pending'] : b.cancel_requested_at ? ['req','Request in progress'] : paidFull ? ['paid','Fully paid'] : ['confirmed','Booking confirmed'];
+      var acts = '';
+      if(ok){
+        if(b.balance_due>0 && !b.cancel_requested_at) acts += '<button class="pay" data-a="pay" data-id="'+b.id+'">Pay balance '+inr(b.balance_due)+'</button>';
+        acts += '<button data-a="receipt" data-id="'+b.id+'">Receipt</button>';
+        acts += '<a href="/itineraries/'+encodeURIComponent(b.trek)+'.pdf" target="_blank" rel="noopener">Itinerary PDF</a>';
+        acts += '<button data-a="req" data-id="'+b.id+'">Change / cancel</button>';
+      }
+      var reqBox = ok ? '<div class="req-box" id="rb-'+b.id+'"><select id="rt-'+b.id+'"><option value="change">Change my date / details</option><option value="cancel">Cancel my booking</option></select>'
+        + '<textarea id="rm-'+b.id+'" placeholder="Tell us what you need…"></textarea><div class="acts"><button class="pay" data-a="sendreq" data-id="'+b.id+'">Send request</button></div>'
+        + '<div class="note">Refunds follow our <a href="/refund-policy.html">refund policy</a>. Our team will contact you.</div></div>' : '';
+      return '<div class="bk"><div class="top"><h3>'+esc(b.trek_name||b.trek)+'</h3><span class="badge '+badge[0]+'">'+badge[1]+'</span></div>'
         + '<div class="grid">'
         + '<div>Travellers<b>'+esc(b.travellers)+' ('+esc(b.sharing)+' sharing)</b></div>'
         + '<div>Preferred date<b>'+esc(b.travel_date||'To be confirmed')+'</b></div>'
         + '<div>Advance paid<b>'+inr(b.advance_paid)+'</b></div>'
-        + '<div>Balance due at onboarding<b>'+inr(b.balance_due)+'</b></div>'
+        + '<div>'+(paidFull?'Balance paid':'Balance due')+'<b>'+(paidFull?inr(b.balance_paid_amount):inr(b.balance_due))+'</b></div>'
         + '<div>Total<b>'+inr(b.total_amount)+'</b></div>'
         + '<div>Payment ID<b>'+esc(b.razorpay_payment_id||'—')+'</b></div>'
-        + '</div></div>';
+        + '</div>' + (b.cancel_requested_at ? '<div class="note">Your request has been sent to our team.</div>' : '') + '<div class="acts">'+acts+'</div>' + reqBox + '</div>';
     }).join('');
   }
+
+  async function token(){ var s=await sb.auth.getSession(); return s.data.session && s.data.session.access_token; }
+  async function api(fn, body){
+    var r = await fetch('/.netlify/functions/'+fn,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+await token()},body:JSON.stringify(body)});
+    var d = await r.json().catch(function(){return {}}); if(!r.ok) throw new Error(d.error||'Something went wrong'); return d;
+  }
+  async function reload(){
+    var bk = await sb.from('bookings').select('*').order('created_at',{ascending:false});
+    window.__rows = (bk.data||[]).filter(function(b){return b.status==='confirmed'||b.status==='pending'}); render();
+  }
+  function receipt(b){
+    var w = window.open('','_blank'); if(!w) return alert('Please allow pop-ups to view the receipt.');
+    var paidBal = b.balance_paid_amount||0, paid = (b.advance_paid||0)+paidBal;
+    w.document.write('<title>Receipt</title><body style="font-family:Arial;max-width:640px;margin:30px auto;color:#13243C"><h2 style="color:#043C87;margin-bottom:0">Trip Trek India</h2><div style="color:#5A6B80;font-size:13px">Hitman Digital Pvt. Ltd. · triptrekindia.in · +91 93109 65771</div><hr><h3>Payment receipt</h3>'
+     +'<table style="width:100%;font-size:14px;border-collapse:collapse">'
+     +[['Name',b.name],['Email',b.email],['Trip',b.trek_name],['Travellers',b.travellers+' ('+b.sharing+' sharing)'],['Preferred date',b.travel_date||'To be confirmed'],['Trip total',inr(b.total_amount)],['Advance paid',inr(b.advance_paid)+' (ID '+(b.razorpay_payment_id||'-')+')'],['Balance paid',paidBal?inr(paidBal)+' (ID '+(b.balance_payment_id||'-')+')':'—'],['Total received',inr(paid)],['Balance remaining',inr(b.balance_due)]]
+       .map(function(r){return '<tr><td style="padding:7px 0;border-bottom:1px solid #eee;color:#5A6B80">'+r[0]+'</td><td style="text-align:right;border-bottom:1px solid #eee"><b>'+esc(r[1])+'</b></td></tr>'}).join('')
+     +'</table><p style="font-size:12px;color:#5A6B80">Booking ref: '+esc(b.id)+'. This is a computer-generated receipt.</p><p><button onclick="print()">Print / Save as PDF</button></p></body>');
+    w.document.close();
+  }
+  $('bookings').addEventListener('click', async function(e){
+    var el = e.target.closest('[data-a]'); if(!el) return;
+    var id = el.getAttribute('data-id'), a = el.getAttribute('data-a');
+    var b = (window.__rows||[]).filter(function(x){return String(x.id)===id})[0]; if(!b) return;
+    try{
+      if(a==='receipt') return receipt(b);
+      if(a==='req'){ var rb=$('rb-'+id); rb.style.display = rb.style.display==='block'?'none':'block'; return; }
+      if(a==='sendreq'){
+        el.disabled = true;
+        await api('booking-request',{booking_id:b.id,type:$('rt-'+id).value,message:$('rm-'+id).value});
+        say('Request sent. Our team will contact you shortly.','ok'); await reload(); return;
+      }
+      if(a==='pay'){
+        el.disabled = true;
+        var o = await api('create-balance-order',{booking_id:b.id});
+        new Razorpay({
+          key:o.key, amount:o.amount, currency:'INR', order_id:o.order_id, name:'Trip Trek India', description:'Balance — '+o.trek_name,
+          prefill:{name:o.name,email:o.email,contact:o.phone}, theme:{color:'#043C87'},
+          handler: async function(resp){
+            try{ var r = await fetch('/.netlify/functions/verify-balance-payment',{method:'POST',body:JSON.stringify(resp)}); if(!r.ok) throw 0; say('Payment received. Thank you!','ok'); }
+            catch(_){ say('Payment received — it will show here in a moment.','ok'); }
+            setTimeout(reload,1500);
+          },
+          modal:{ondismiss:function(){el.disabled=false}}
+        }).open();
+      }
+    }catch(err){ say(err.message); el.disabled=false; }
+  });
 
   var s = await sb.auth.getSession();
   if(s.data.session) showDash(s.data.session.user, false);
