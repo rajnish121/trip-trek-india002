@@ -16,6 +16,20 @@ const json = (status, body) => ({
   body: JSON.stringify(body),
 });
 
+
+// ---- Departure dates: every trip departs on a Friday, except the trips listed in DATA.anyday ----
+const MIN_LEAD_DAYS = 2;
+const todayIST = () => new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
+function departureError(trek, date) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date || '')) return 'Please choose your departure date.';
+  const d = new Date(date + 'T00:00:00Z');
+  if (isNaN(d) || d.toISOString().slice(0, 10) !== date) return 'Please choose a valid departure date.';
+  const min = new Date(todayIST() + 'T00:00:00Z'); min.setUTCDate(min.getUTCDate() + MIN_LEAD_DAYS);
+  if (d < min) return 'Please choose a date at least ' + MIN_LEAD_DAYS + ' days from today.';
+  if (!(DATA.anyday || []).includes(trek) && d.getUTCDay() !== 5) return 'This trip departs on Fridays only. Please choose a Friday.';
+  return null;
+}
+
 // ---- Supabase (REST, service role: server only) ----
 async function sb(path, { method = 'GET', body, prefer } = {}) {
   const url = env('SUPABASE_URL').replace(/\/$/, '') + '/rest/v1/' + path;
@@ -252,5 +266,5 @@ async function confirmBooking(orderId, paymentId) {
 module.exports = {
   DATA, ADVANCE_PER_PERSON, env, json, sb, rzCreateOrder, verifyCheckoutSignature,
   timingSafeEqualHex, confirmBooking, sendConfirmationEmail, crypto,
-  sendMail, wrapMail, esc, inr, teamList, getUser, requireAdmin, confirmBalance,
+  sendMail, wrapMail, esc, inr, teamList, getUser, requireAdmin, confirmBalance, departureError, MIN_LEAD_DAYS,
 };

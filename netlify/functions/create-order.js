@@ -1,4 +1,4 @@
-const { DATA, ADVANCE_PER_PERSON, env, json, sb, rzCreateOrder } = require('./_lib');
+const { DATA, ADVANCE_PER_PERSON, env, json, sb, rzCreateOrder, departureError } = require('./_lib');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'POST only' });
@@ -21,6 +21,8 @@ exports.handler = async (event) => {
     if (name.length < 2) return json(400, { error: 'Please enter your name' });
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return json(400, { error: 'Please enter a valid email' });
     if (!/^[6-9]\d{9}$/.test(phone)) return json(400, { error: 'Please enter a valid 10-digit mobile number' });
+    const dateErr = departureError(trek, travelDate);
+    if (dateErr) return json(400, { error: dateErr });
 
     // All amounts are computed here, never trusted from the browser.
     const total = pricePer * travellers;
