@@ -1,92 +1,102 @@
 {
- "prices": {
-  "chakrata": {
-   "quad": 4999,
-   "triple": 5499,
-   "double": 5999
+  "prices": {
+    "chakrata": {
+      "quad": 4999,
+      "triple": 5499,
+      "double": 5999
+    },
+    "chitkul-kalpa": {
+      "quad": 9999,
+      "double": 11999
+    },
+    "chopta-tungnath-chandrashila": {
+      "quad": 4999,
+      "triple": 5499,
+      "double": 5999
+    },
+    "jibhi-tirthan-valley": {
+      "quad": 5999,
+      "triple": 6499,
+      "double": 6999
+    },
+    "kanatal-tehri": {
+      "quad": 4999,
+      "triple": 5499,
+      "double": 5999
+    },
+    "kedarnath-yatra": {
+      "quad": 8999,
+      "triple": 9499,
+      "double": 9999
+    },
+    "madhyamaheshwar": {
+      "quad": 5999,
+      "triple": 6499,
+      "double": 6999
+    },
+    "manali-kasol": {
+      "quad": 4999,
+      "triple": 5499,
+      "double": 5999
+    },
+    "mcleodganj-triund": {
+      "quad": 6999,
+      "triple": 7499,
+      "double": 7999
+    },
+    "rudranath": {
+      "quad": 4999,
+      "triple": 5499,
+      "double": 5999
+    },
+    "yulla-kanda": {
+      "quad": 6999,
+      "double": 7999,
+      "solo": 8999
+    },
+    "udaipur-mount-abu": {
+      "quad": 6999,
+      "double": 7999
+    },
+    "kedarkantha": {
+      "quad": 5999,
+      "double": 6999
+    },
+    "jaisalmer": {
+      "quad": 8999,
+      "double": 9999
+    },
+    "manali-kasol-4d3n": {
+      "quad": 5999,
+      "double": 6999
+    },
+    "harsil-valley": {
+      "quad": 8999,
+      "double": 9999
+    }
   },
-  "chitkul-kalpa": {
-   "quad": 9999,
-   "double": 11999
+  "names": {
+    "chakrata": "Chakrata Weekend Getaway — Tiger Falls & Moila Top",
+    "chitkul-kalpa": "Chitkul – Kalpa Trip",
+    "chopta-tungnath-chandrashila": "Chopta – Tungnath – Chandrashila Trek",
+    "jibhi-tirthan-valley": "Jibhi Tirthan Valley — Mini Thailand of India",
+    "kanatal-tehri": "Kanatal – Tehri Lake Trip",
+    "kedarnath-yatra": "Kedarnath Yatra — Jyotirlinga Pilgrimage",
+    "madhyamaheshwar": "Madhyamaheshwar Trek — Second Kedar",
+    "manali-kasol": "Manali – Kasol Trip",
+    "mcleodganj-triund": "McLeodganj – Triund Trek",
+    "rudranath": "Rudranath Trek — Panch Kedar Pilgrimage",
+    "yulla-kanda": "Yulla Kanda Trek — World's Highest Krishna Temple",
+    "udaipur-mount-abu": "Udaipur with Mount Abu Trip",
+    "kedarkantha": "Kedarkantha Trek — Sankri, Uttarakhand",
+    "jaisalmer": "Jaisalmer Trip — Kuldhara & Longewala",
+    "manali-kasol-4d3n": "Manali – Kasol Trip 4D/3N — Atal Tunnel & Kasol Camps",
+    "harsil-valley": "Harsil Valley Trip — Gartang Gali & Gangotri"
   },
-  "chopta-tungnath-chandrashila": {
-   "quad": 4999,
-   "triple": 5499,
-   "double": 5999
-  },
-  "jibhi-tirthan-valley": {
-   "quad": 5999,
-   "triple": 6499,
-   "double": 6999
-  },
-  "kanatal-tehri": {
-   "quad": 4999,
-   "triple": 5499,
-   "double": 5999
-  },
-  "kedarnath-yatra": {
-   "quad": 8999,
-   "triple": 9499,
-   "double": 9999
-  },
-  "madhyamaheshwar": {
-   "quad": 5999,
-   "triple": 6499,
-   "double": 6999
-  },
-  "manali-kasol": {
-   "quad": 4999,
-   "triple": 5499,
-   "double": 5999
-  },
-  "mcleodganj-triund": {
-   "quad": 6999,
-   "triple": 7499,
-   "double": 7999
-  },
-  "rudranath": {
-   "quad": 4999,
-   "triple": 5499,
-   "double": 5999
-  },
-  "yulla-kanda": {
-   "quad": 6999,
-   "double": 7999,
-   "solo": 8999
-  },
-  "udaipur-mount-abu": {
-   "quad": 6999,
-   "double": 7999
-  },
-  "kedarkantha": {
-   "quad": 5999,
-   "double": 6999
-  },
-  "jaisalmer": {
-   "quad": 8999,
-   "double": 9999
+  "closed": {
+    "yulla-kanda": "Opens April 2027",
+    "madhyamaheshwar": "Opens 2027",
+    "kedarnath-yatra": "Opens 2027",
+    "rudranath": "Opens 2027"
   }
- },
- "names": {
-  "chakrata": "Chakrata Weekend Getaway — Tiger Falls & Moila Top",
-  "chitkul-kalpa": "Chitkul – Kalpa Trip",
-  "chopta-tungnath-chandrashila": "Chopta – Tungnath – Chandrashila Trek",
-  "jibhi-tirthan-valley": "Jibhi Tirthan Valley — Mini Thailand of India",
-  "kanatal-tehri": "Kanatal – Tehri Lake Trip",
-  "kedarnath-yatra": "Kedarnath Yatra — Jyotirlinga Pilgrimage",
-  "madhyamaheshwar": "Madhyamaheshwar Trek — Second Kedar",
-  "manali-kasol": "Manali – Kasol Trip",
-  "mcleodganj-triund": "McLeodganj – Triund Trek",
-  "rudranath": "Rudranath Trek — Panch Kedar Pilgrimage",
-  "yulla-kanda": "Yulla Kanda Trek — World's Highest Krishna Temple",
-  "udaipur-mount-abu": "Udaipur with Mount Abu Trip",
-  "kedarkantha": "Kedarkantha Trek — Sankri, Uttarakhand",
-  "jaisalmer": "Jaisalmer Trip — Kuldhara & Longewala"
- },
- "closed": {
-  "yulla-kanda": "Opens April 2027",
-  "madhyamaheshwar": "Opens 2027",
-  "kedarnath-yatra": "Opens 2027",
-  "rudranath": "Opens 2027"
- }
 }
