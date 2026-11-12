@@ -642,8 +642,8 @@
             <input type="number" id="f_count" min="1" max="20" value="1">
           </div>
         </div>
-        <div class="field">
-          <label for="f_date">Preferred departure date</label>
+        <div class="field" id="dateField" data-departure="any">
+          <label for="f_date">Departure date</label>
           <input type="date" id="f_date">
         </div>
 
@@ -823,6 +823,7 @@
     var phone = document.getElementById('f_phone').value.trim();
     var email = document.getElementById('f_email').value.trim();
     var date = document.getElementById('f_date').value;
+    if(!date){ toast('Please choose your departure date.'); document.getElementById('f_date').focus(); return; }
 
     btn.disabled = true; btn.textContent = 'Starting secure payment…';
     var order;
@@ -879,6 +880,7 @@
   });
 </script>
 
+<script src="/assets/departures.js" defer></script>
 <script src="/assets/reviews.js" defer></script>
 <script src="/assets/newsletter.js" defer></script>
 </body>

@@ -84,6 +84,41 @@
   .trek-price b{color:var(--navy);font-size:16px;}
   .trek-link{font-size:13.5px;font-weight:600;color:var(--orange);}
 
+
+  /* ---- trips: filters, groups, notify ---- */
+  .trek-filters{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:30px;}
+  .tf{border:1.5px solid var(--stone-line);background:var(--white);color:var(--navy);font:inherit;font-size:14px;font-weight:600;padding:9px 18px;border-radius:999px;cursor:pointer;transition:background .15s,color .15s,border-color .15s;}
+  .tf:hover{border-color:var(--navy);}
+  .tf.on{background:var(--navy);border-color:var(--navy);color:var(--white);}
+  .trek-empty{margin:34px auto 0;max-width:560px;text-align:center;font-size:15px;color:var(--grey);line-height:1.6;}
+  .trek-empty a{color:var(--blue);font-weight:600;}
+  .trek-card.f-hide{display:none;}
+  .trek-empty[hidden],.trek-group[hidden]{display:none;}
+  .grp-head{display:flex;align-items:center;gap:14px;margin-top:50px;flex-wrap:wrap;}
+  .grp-head h3{font-size:22px;color:var(--navy);line-height:1.2;}
+  .grp-head small{color:var(--grey);font-size:14px;}
+  .grp-dot{width:10px;height:10px;border-radius:50%;background:#1A9A4A;flex:none;}
+  .grp-dot.soon{background:#9AA5B4;}
+  .grp-line{flex:1;min-width:30px;height:1px;background:var(--stone-line);}
+  .trek-group .trek-grid{margin-top:24px;}
+  .trek-card .open-badge{position:absolute;top:14px;left:14px;z-index:2;background:#1A9A4A;color:#fff;font-size:12px;font-weight:700;padding:6px 12px;border-radius:999px;letter-spacing:.02em;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .notify-btn{background:var(--orange);color:#fff!important;padding:8px 15px;border-radius:999px;font-size:13px;cursor:pointer;}
+  .trek-card.is-closed .notify-btn{color:#fff;}
+  .notify-btn:hover{filter:brightness(.92);}
+  .nm-back{position:fixed;inset:0;background:rgba(0,16,40,.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .nm-back[hidden]{display:none;}
+  .nm-box{background:#fff;border-radius:18px;max-width:420px;width:100%;padding:28px 26px 24px;position:relative;box-shadow:0 30px 70px -20px rgba(0,0,0,.6);}
+  .nm-box h4{font-size:20px;color:var(--navy);line-height:1.25;padding-right:26px;}
+  .nm-box p{font-size:14px;color:var(--grey);margin:8px 0 16px;line-height:1.55;}
+  .nm-box form{display:flex;gap:8px;flex-wrap:wrap;}
+  .nm-box input[type=email]{flex:1;min-width:180px;padding:12px 14px;border:1px solid #cfd8e6;border-radius:10px;font:inherit;font-size:15px;}
+  .nm-box .hp{position:absolute;left:-9999px;}
+  .nm-box button[type=submit]{padding:12px 20px;border:0;border-radius:10px;background:var(--orange);color:#fff;font:inherit;font-weight:600;font-size:15px;cursor:pointer;}
+  .nm-box button[disabled]{opacity:.6;}
+  .nm-x{position:absolute;top:10px;right:12px;border:0;background:none;font-size:26px;line-height:1;color:#6b7686;cursor:pointer;}
+  .nm-msg{margin-top:12px;font-size:13.5px;min-height:18px;}
+  @media (max-width:560px){.trek-filters{justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;margin-right:-20px;padding-right:20px;-webkit-overflow-scrolling:touch}.tf{white-space:nowrap;flex:none}.grp-head{margin-top:38px}.grp-head small{flex-basis:100%;order:3}}
+
   #why{background:var(--white);}
   .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:52px;border-top:1px solid var(--stone-line);}
   .why-row{display:flex;gap:14px;align-items:flex-start;padding:20px 22px;border-bottom:1px solid var(--stone-line);}
@@ -145,6 +180,29 @@
     .hero-photo{order:-1;}
     .hero-photo::before{inset:12px -8px -12px 8px;}
   }
+
+  .hero-copy{position:relative;z-index:6;min-width:0;}
+  .tsearch{position:relative;margin-top:28px;max-width:640px;width:100%;}
+  .tsearch-bar{display:flex;align-items:center;gap:10px;background:#f3f3f3;border-radius:999px;padding:6px 6px 6px 20px;box-shadow:0 14px 34px -14px rgba(0,0,0,.55);}
+  .tsearch-bar svg{flex:none;color:#6b7686;}
+  .tsearch-bar input{flex:1;min-width:0;width:100%;border:none;background:transparent;font:inherit;font-size:16px;color:#1b2430;padding:13px 4px;outline:none;}
+  .tsearch-bar input::placeholder{color:#6b7686;}
+  .tsearch-bar button{flex:none;border:none;cursor:pointer;background:var(--blue);color:#fff;font:inherit;font-size:15px;font-weight:600;padding:13px 26px;border-radius:999px;}
+  .tsearch-bar button:hover{background:var(--navy);}
+  .tsearch-list{position:absolute;left:0;right:0;top:calc(100% + 8px);background:#fff;border-radius:18px;box-shadow:0 22px 50px -16px rgba(0,0,0,.5);padding:6px;max-height:340px;overflow:auto;z-index:20;}
+  .tsearch-list[hidden]{display:none;}
+  .tsearch-list a{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;color:#1b2430;text-decoration:none;}
+  .tsearch-list a:hover,.tsearch-list a:focus{background:#eef3fb;outline:none;}
+  .tsearch-list b{display:block;font-size:15px;color:var(--navy);}
+  .tsearch-list small{display:block;font-size:12.5px;color:#6b7686;margin-top:2px;}
+  .tsearch-list em{font-style:normal;font-size:13px;font-weight:600;color:var(--orange);white-space:nowrap;}
+  .tsearch-none{padding:14px;font-size:14.5px;color:#3d4757;line-height:1.55;}
+  .tsearch-none a{display:inline;padding:0;color:var(--blue);font-weight:600;text-decoration:underline;}
+  .search-status{margin:22px 0 0;padding:14px 18px;background:#eef3fb;border:1px solid #d6e2f5;border-radius:14px;font-size:15px;color:var(--navy);display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;}
+  .search-status[hidden]{display:none;}
+  .search-status button{border:none;background:none;color:var(--orange);font:inherit;font-weight:600;cursor:pointer;text-decoration:underline;}
+  .search-status a{color:var(--blue);font-weight:600;}
+  @media (max-width:560px){.tsearch-bar{padding-left:16px}.tsearch-bar button{padding:12px 18px}}
 </style>
 <style>
 .pg-head{padding:64px 0 8px;background:linear-gradient(180deg,#f4f7fc,#fff);text-align:center;}
@@ -225,7 +283,7 @@
 <details class="faq-item"><summary>What is included in the price?</summary><p>Each trip page lists its inclusions. Most include transport, stay on a sharing basis, the meals mentioned in the itinerary, the sightseeing listed, toll and parking charges, and an experienced Trip Captain with on-ground support.</p></details>
 <details class="faq-item"><summary>What is not included?</summary><p>Usually meals not mentioned in the itinerary, tips, laundry, personal expenses, camera fees and optional extras. Check the Inclusions and Exclusions section of the trip you want, because it lists exactly what applies.</p></details>
 <details class="faq-item"><summary>Some trips say they are closed. What does that mean?</summary><p>Those trips are not taking bookings right now, and the label shows when they open. Message us on WhatsApp and we can let you know when bookings open.</p></details>
-<details class="faq-item"><summary>Where can I find the departure dates?</summary><p>Look at the <a href="upcoming-trips.html">Upcoming Trips</a> page, or message us on WhatsApp for the next confirmed batch of any trip. Dates change with the season and group size.</p></details>
+<details class="faq-item"><summary>Which days do the trips depart?</summary><p>Every trip departs on a Friday. The exceptions are the Chopta Tungnath Chandrashila trek, both Manali trips and the Kedarkantha trek, which run on any day you choose. You pick your date on the trip page when you book, and closed trips show when they reopen.</p></details>
 <h2 class="faq-cat">Cancellation &amp; refunds</h2>
 <details class="faq-item"><summary>Is the booking advance refundable?</summary><p>No. The booking advance is non-refundable under any circumstances, as stated in our <a href="refund-policy.html">Refund Policy</a>.</p></details>
 <details class="faq-item"><summary>What happens if I cancel?</summary><p>If you cancel within 24 hours of departure, or do not arrive at the pickup point, no refund is due on any amount paid. If you cancel earlier, the advance stays non-refundable, and any refund of money paid beyond the advance is at our discretion, usually as a credit note for a future trip. Please read the full <a href="refund-policy.html">Refund Policy</a> before you book.</p></details>
@@ -246,7 +304,7 @@
   <a class="btn btn-ghost" href="contact-us.html" style="margin-left:8px;color:var(--navy);border:1.5px solid var(--navy)">Contact Us</a>
 </div>
 </div></div></section>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I book a trip?", "acceptedAnswer": {"@type": "Answer", "text": "Open the trip you like, choose your sharing type, enter your name, phone, email and number of travellers, and pay the advance online. You get a confirmation email as soon as the payment is done. If you prefer, you can also enquire on WhatsApp first."}}, {"@type": "Question", "name": "How much is the booking advance?", "acceptedAnswer": {"@type": "Answer", "text": "The advance is ₹2,000 per person unless a different amount is stated on the trip page. It confirms your seat. The remaining balance is collected at the time of onboarding."}}, {"@type": "Question", "name": "Which payment methods can I use?", "acceptedAnswer": {"@type": "Answer", "text": "Payments are made online through Razorpay, so you can pay with the options shown at checkout, such as UPI, cards and net banking."}}, {"@type": "Question", "name": "Will I get a booking confirmation?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. After the advance is paid you receive a confirmation email, and the booking also appears in My Account."}}, {"@type": "Question", "name": "How do I log in to My Account?", "acceptedAnswer": {"@type": "Answer", "text": "Open My Account, enter your email, and we send a one-time code to it. Enter the code to log in. There is no password to remember. Your bookings and payment details are shown there."}}, {"@type": "Question", "name": "Can I book for friends or family?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Enter the total number of travellers when you book, and the advance is calculated for everyone in your booking."}}, {"@type": "Question", "name": "Are the prices per person?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. All prices on the website are per person, based on the sharing type you choose."}}, {"@type": "Question", "name": "What do quad, triple and double sharing mean?", "acceptedAnswer": {"@type": "Answer", "text": "It is the number of travellers who share a room: four for quad, three for triple and two for double. Quad is the most budget-friendly, and double gives more space for couples and pairs. The sharing types available differ by trip."}}, {"@type": "Question", "name": "What is included in the price?", "acceptedAnswer": {"@type": "Answer", "text": "Each trip page lists its inclusions. Most include transport, stay on a sharing basis, the meals mentioned in the itinerary, the sightseeing listed, toll and parking charges, and an experienced Trip Captain with on-ground support."}}, {"@type": "Question", "name": "What is not included?", "acceptedAnswer": {"@type": "Answer", "text": "Usually meals not mentioned in the itinerary, tips, laundry, personal expenses, camera fees and optional extras. Check the Inclusions and Exclusions section of the trip you want, because it lists exactly what applies."}}, {"@type": "Question", "name": "Some trips say they are closed. What does that mean?", "acceptedAnswer": {"@type": "Answer", "text": "Those trips are not taking bookings right now, and the label shows when they open. Message us on WhatsApp and we can let you know when bookings open."}}, {"@type": "Question", "name": "Where can I find the departure dates?", "acceptedAnswer": {"@type": "Answer", "text": "Look at the Upcoming Trips page, or message us on WhatsApp for the next confirmed batch of any trip. Dates change with the season and group size."}}, {"@type": "Question", "name": "Is the booking advance refundable?", "acceptedAnswer": {"@type": "Answer", "text": "No. The booking advance is non-refundable under any circumstances, as stated in our Refund Policy."}}, {"@type": "Question", "name": "What happens if I cancel?", "acceptedAnswer": {"@type": "Answer", "text": "If you cancel within 24 hours of departure, or do not arrive at the pickup point, no refund is due on any amount paid. If you cancel earlier, the advance stays non-refundable, and any refund of money paid beyond the advance is at our discretion, usually as a credit note for a future trip. Please read the full Refund Policy before you book."}}, {"@type": "Question", "name": "What if Trip Trek India cancels or reschedules the trip?", "acceptedAnswer": {"@type": "Answer", "text": "If we cancel a trip, for reasons such as weather, a small group or circumstances beyond our control, you are offered either a credit note for a future trip or a refund of amounts paid, at our discretion."}}, {"@type": "Question", "name": "How do I cancel a booking?", "acceptedAnswer": {"@type": "Answer", "text": "Write to Bookings@triptrekindia.in or message us on WhatsApp at +91 93109 65771 with your booking name and trip. The time of your written request decides which part of the policy applies."}}, {"@type": "Question", "name": "Who is the Trip Captain?", "acceptedAnswer": {"@type": "Answer", "text": "The Trip Captain is the experienced person who leads and looks after your group from start to finish, and who knows the route, the stays and the plan for each day."}}, {"@type": "Question", "name": "I am a beginner. Can I join?", "acceptedAnswer": {"@type": "Answer", "text": "Many of our trips, especially the weekend getaways, suit first-time travellers. Treks differ in difficulty, so check the trip page and ask us before booking if you are unsure. Our guide to beginner-friendly Himalayan treks can also help."}}, {"@type": "Question", "name": "Where do the trips start and end?", "acceptedAnswer": {"@type": "Answer", "text": "Most trips start and end in Delhi, and the Kedarnath Yatra runs from Haridwar to Haridwar. Our team confirms the pickup point and time with you before departure."}}, {"@type": "Question", "name": "What should I carry?", "acceptedAnswer": {"@type": "Answer", "text": "Comfortable shoes, warm layers for the hills, a rain jacket, any medicines you use, a power bank and a valid photo ID. Our group trip checklist on the blog has a fuller list."}}, {"@type": "Question", "name": "Can the plan change during the trip?", "acceptedAnswer": {"@type": "Answer", "text": "Weather, road conditions and safety can change the plan on the mountains. The Trip Captain may adjust the itinerary to keep the group safe and to make the most of the trip."}}, {"@type": "Question", "name": "How can I reach you?", "acceptedAnswer": {"@type": "Answer", "text": "Call or WhatsApp +91 93109 65771 or +91 88105 55416. You can write to info@triptrekindia.in for general questions and Bookings@triptrekindia.in for bookings and cancellations. You can also message us on Instagram at @trip.trekindia."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do I book a trip?", "acceptedAnswer": {"@type": "Answer", "text": "Open the trip you like, choose your sharing type, enter your name, phone, email and number of travellers, and pay the advance online. You get a confirmation email as soon as the payment is done. If you prefer, you can also enquire on WhatsApp first."}}, {"@type": "Question", "name": "How much is the booking advance?", "acceptedAnswer": {"@type": "Answer", "text": "The advance is ₹2,000 per person unless a different amount is stated on the trip page. It confirms your seat. The remaining balance is collected at the time of onboarding."}}, {"@type": "Question", "name": "Which payment methods can I use?", "acceptedAnswer": {"@type": "Answer", "text": "Payments are made online through Razorpay, so you can pay with the options shown at checkout, such as UPI, cards and net banking."}}, {"@type": "Question", "name": "Will I get a booking confirmation?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. After the advance is paid you receive a confirmation email, and the booking also appears in My Account."}}, {"@type": "Question", "name": "How do I log in to My Account?", "acceptedAnswer": {"@type": "Answer", "text": "Open My Account, enter your email, and we send a one-time code to it. Enter the code to log in. There is no password to remember. Your bookings and payment details are shown there."}}, {"@type": "Question", "name": "Can I book for friends or family?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Enter the total number of travellers when you book, and the advance is calculated for everyone in your booking."}}, {"@type": "Question", "name": "Are the prices per person?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. All prices on the website are per person, based on the sharing type you choose."}}, {"@type": "Question", "name": "What do quad, triple and double sharing mean?", "acceptedAnswer": {"@type": "Answer", "text": "It is the number of travellers who share a room: four for quad, three for triple and two for double. Quad is the most budget-friendly, and double gives more space for couples and pairs. The sharing types available differ by trip."}}, {"@type": "Question", "name": "What is included in the price?", "acceptedAnswer": {"@type": "Answer", "text": "Each trip page lists its inclusions. Most include transport, stay on a sharing basis, the meals mentioned in the itinerary, the sightseeing listed, toll and parking charges, and an experienced Trip Captain with on-ground support."}}, {"@type": "Question", "name": "What is not included?", "acceptedAnswer": {"@type": "Answer", "text": "Usually meals not mentioned in the itinerary, tips, laundry, personal expenses, camera fees and optional extras. Check the Inclusions and Exclusions section of the trip you want, because it lists exactly what applies."}}, {"@type": "Question", "name": "Some trips say they are closed. What does that mean?", "acceptedAnswer": {"@type": "Answer", "text": "Those trips are not taking bookings right now, and the label shows when they open. Message us on WhatsApp and we can let you know when bookings open."}}, {"@type": "Question", "name": "Which days do the trips depart?", "acceptedAnswer": {"@type": "Answer", "text": "Every trip departs on a Friday. The exceptions are the Chopta Tungnath Chandrashila trek, both Manali trips and the Kedarkantha trek, which run on any day you choose. You pick your date on the trip page when you book, and closed trips show when they reopen."}}, {"@type": "Question", "name": "Is the booking advance refundable?", "acceptedAnswer": {"@type": "Answer", "text": "No. The booking advance is non-refundable under any circumstances, as stated in our Refund Policy."}}, {"@type": "Question", "name": "What happens if I cancel?", "acceptedAnswer": {"@type": "Answer", "text": "If you cancel within 24 hours of departure, or do not arrive at the pickup point, no refund is due on any amount paid. If you cancel earlier, the advance stays non-refundable, and any refund of money paid beyond the advance is at our discretion, usually as a credit note for a future trip. Please read the full Refund Policy before you book."}}, {"@type": "Question", "name": "What if Trip Trek India cancels or reschedules the trip?", "acceptedAnswer": {"@type": "Answer", "text": "If we cancel a trip, for reasons such as weather, a small group or circumstances beyond our control, you are offered either a credit note for a future trip or a refund of amounts paid, at our discretion."}}, {"@type": "Question", "name": "How do I cancel a booking?", "acceptedAnswer": {"@type": "Answer", "text": "Write to Bookings@triptrekindia.in or message us on WhatsApp at +91 93109 65771 with your booking name and trip. The time of your written request decides which part of the policy applies."}}, {"@type": "Question", "name": "Who is the Trip Captain?", "acceptedAnswer": {"@type": "Answer", "text": "The Trip Captain is the experienced person who leads and looks after your group from start to finish, and who knows the route, the stays and the plan for each day."}}, {"@type": "Question", "name": "I am a beginner. Can I join?", "acceptedAnswer": {"@type": "Answer", "text": "Many of our trips, especially the weekend getaways, suit first-time travellers. Treks differ in difficulty, so check the trip page and ask us before booking if you are unsure. Our guide to beginner-friendly Himalayan treks can also help."}}, {"@type": "Question", "name": "Where do the trips start and end?", "acceptedAnswer": {"@type": "Answer", "text": "Most trips start and end in Delhi, and the Kedarnath Yatra runs from Haridwar to Haridwar. Our team confirms the pickup point and time with you before departure."}}, {"@type": "Question", "name": "What should I carry?", "acceptedAnswer": {"@type": "Answer", "text": "Comfortable shoes, warm layers for the hills, a rain jacket, any medicines you use, a power bank and a valid photo ID. Our group trip checklist on the blog has a fuller list."}}, {"@type": "Question", "name": "Can the plan change during the trip?", "acceptedAnswer": {"@type": "Answer", "text": "Weather, road conditions and safety can change the plan on the mountains. The Trip Captain may adjust the itinerary to keep the group safe and to make the most of the trip."}}, {"@type": "Question", "name": "How can I reach you?", "acceptedAnswer": {"@type": "Answer", "text": "Call or WhatsApp +91 93109 65771 or +91 88105 55416. You can write to info@triptrekindia.in for general questions and Bookings@triptrekindia.in for bookings and cancellations. You can also message us on Instagram at @trip.trekindia."}}]}</script>
 
 <footer>
   <div class="wrap">
@@ -298,6 +356,140 @@
   });
 </script>
 
+<script>
+(function(){
+  var form=document.getElementById('tripSearch'); if(!form) return;
+  var input=document.getElementById('tripSearchInput'), list=document.getElementById('tripSearchList'), status=document.getElementById('searchStatus');
+  var grid=document.getElementById('treks'); if(!grid) return;
+  var EXTRA={'chakrata':'weekend tiger falls moila top dehradun','kanatal-tehri':'weekend lake water sports surkanda devi','mcleodganj-triund':'dharamshala dharamsala tibetan summit','manali-kasol':'atal tunnel sissu parvati','jibhi-tirthan-valley':'tirthan himachal mini thailand','kedarnath-yatra':'kedar shiva jyotirlinga char dham pilgrimage','madhyamaheshwar':'madmaheshwar panch kedar pilgrimage','rudranath':'panch kedar pilgrimage','yulla-kanda':'krishna temple','udaipur-mount-abu':'mount abu rajasthan lakes city palace','kedarkantha':'sankri summit snow juda ka talab uttarakhand dehradun winter','manali-kasol-4d3n':'manali kasol 4 day atal tunnel sissu solang hadimba parvati manikaran himachal','kashmir-tour-5d4n':'kashmir srinagar gulmarg sonmarg pahalgam dal lake shikara jammu winter snow honeymoon','darma-valley':'darma valley panchachuli base camp nepal border dharchula pithoragarh dugtu dantu tawaghat sobla uttarakhand remote','munsiyari-khaliya-top':'munsiyari khaliya top kasar devi kainchi dham jageshwar birthi falls zero point panchachuli kumaon uttarakhand','harsil-valley':'harshil gartang gali gangotri lama top bagori uttarkashi bhagirathi uttarakhand','jaisalmer':'desert sam dunes camel safari camps kuldhara longewala tanot rajasthan golden city thar','chitkul-kalpa':'kinnaur sangla last village india','chopta-tungnath-chandrashila':'mini switzerland tungnath chandrashila shiva temple'};
+  var STOP={trip:1,trips:1,trek:1,treks:1,tour:1,tours:1,to:1,in:1,from:1,the:1,a:1,for:1,price:1,rs:1,inr:1,best:1,delhi:1};
+  function norm(t){return (t||'').toLowerCase().replace(/&amp;/g,' ').replace(/[^a-z0-9\u20b9]+/g,' ').trim();}
+  var items=[].slice.call(grid.querySelectorAll('.trek-card')).map(function(c){
+    var href=c.getAttribute('href'), slug=href.split('/')[0];
+    var q=function(sel){var e=c.querySelector(sel);return e?e.textContent.trim():'';};
+    var tag=q('.trek-tag'), title=q('.trek-title'), chip=q('.trek-chip');
+    var m=c.textContent.match(/\u20b9\s*([\d,]+)/), price=m?parseInt(m[1].replace(/,/g,''),10):0;
+    var closed=c.classList.contains('is-closed'), rib=q('.closed-ribbon');
+    var weekend=/(2D\/1N|1N\/2D)/i.test(tag)?' weekend short':'';
+    return {el:c,href:href,title:title,tag:tag.replace(/^CLOSED[^A-Z]*/,''),price:price,closed:closed,label:closed?rib.replace(/^CLOSED\s*\W*\s*/i,''):'',hay:norm([tag,title,chip,EXTRA[slug]||'',weekend,closed?'closed':''].join(' '))};
+  });
+  function parse(q){
+    var max=0, s=q.toLowerCase();
+    var m=s.match(/(?:under|below|less than|upto|up to|within|<)\s*\u20b9?\s*(\d[\d,]*)\s*(k)?/);
+    if(m){max=parseInt(m[1].replace(/,/g,''),10); if(m[2]) max*=1000; if(max<100) max*=1000; s=s.replace(m[0],' ');}
+    var toks=norm(s).split(' ').filter(function(t){return t&&!STOP[t];});
+    return {toks:toks,max:max};
+  }
+  function find(q){
+    var p=parse(q); if(!p.toks.length && !p.max) return [];
+    return items.filter(function(it){
+      if(p.max && it.price>p.max) return false;
+      return p.toks.every(function(t){return it.hay.indexOf(t)>-1;});
+    });
+  }
+  function wa(q){return 'https://wa.me/919310965771?text='+encodeURIComponent('Hi Trip Trek India, I am looking for: '+q);}
+  function esc(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+  function show(q){
+    var r=find(q);
+    if(!q.trim()){list.hidden=true;list.innerHTML='';return r;}
+    if(!r.length){
+      list.innerHTML='<div class="tsearch-none">No trip matches &ldquo;'+esc(q)+'&rdquo;. <a href="'+wa(q)+'" target="_blank" rel="noopener">Ask us on WhatsApp</a> and we will help you find one.</div>';
+    }else{
+      list.innerHTML=r.slice(0,6).map(function(it){
+        return '<a href="'+it.href+'" role="option"><span><b>'+esc(it.title)+'</b><small>'+esc(it.tag)+'</small></span><em>'+(it.closed?esc(it.label||'Closed'):'from \u20b9'+it.price.toLocaleString('en-IN'))+'</em></a>';
+      }).join('');
+    }
+    list.hidden=false; return r;
+  }
+  function clearFilter(){
+    items.forEach(function(it){it.el.style.display='';});
+    status.hidden=true; status.innerHTML=''; if(window.ttiSync) window.ttiSync();
+  }
+  function applyFilter(q){
+    var r=find(q); list.hidden=true;
+    if(r.length===1){window.location.href=r[0].href;return;}
+    items.forEach(function(it){it.el.style.display=r.indexOf(it)>-1?'':'none';});
+    if(window.ttiSync) window.ttiSync();
+    status.hidden=false;
+    status.innerHTML=r.length
+      ? '<span>Showing '+r.length+' trips for &ldquo;'+esc(q)+'&rdquo;</span><button type="button" id="searchClear">Show all trips</button>'
+      : '<span>No trip matches &ldquo;'+esc(q)+'&rdquo;. <a href="'+wa(q)+'" target="_blank" rel="noopener">Ask us on WhatsApp</a></span><button type="button" id="searchClear">Show all trips</button>';
+    document.getElementById('searchClear').onclick=function(){clearFilter();input.value='';};
+    document.getElementById('treks').scrollIntoView({behavior:'smooth'});
+  }
+  input.addEventListener('input',function(){clearFilter();show(input.value);});
+  input.addEventListener('focus',function(){if(input.value.trim()) show(input.value);});
+  input.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){list.hidden=true;}
+    if(e.key==='ArrowDown'){var a=list.querySelector('a'); if(a){e.preventDefault();a.focus();}}
+  });
+  list.addEventListener('keydown',function(e){
+    var a=document.activeElement;
+    if(e.key==='ArrowDown'&&a.nextElementSibling){e.preventDefault();a.nextElementSibling.focus();}
+    if(e.key==='ArrowUp'){e.preventDefault(); if(a.previousElementSibling) a.previousElementSibling.focus(); else input.focus();}
+    if(e.key==='Escape'){list.hidden=true;input.focus();}
+  });
+  form.addEventListener('submit',function(e){e.preventDefault(); if(!input.value.trim()){clearFilter();return;} applyFilter(input.value);});
+  document.addEventListener('click',function(e){if(!form.contains(e.target)) list.hidden=true;});
+})();
+</script>
+<script>
+/* Trips section: filter chips, group visibility and "Notify me" */
+(function(){
+  var root=document.getElementById('treks'); if(!root) return;
+  var chips=[].slice.call(root.querySelectorAll('.tf')), cards=[].slice.call(root.querySelectorAll('.trek-card'));
+  var CATS={'kedarkantha':'trek','chopta-tungnath-chandrashila':'trek pilgrim','madhyamaheshwar':'trek pilgrim','rudranath':'trek pilgrim','kedarnath-yatra':'pilgrim','yulla-kanda':'trek pilgrim','mcleodganj-triund':'trek','munsiyari-khaliya-top':'trek','harsil-valley':'trek'};
+  cards.forEach(function(c){
+    var slug=c.getAttribute('href').split('/')[0], tag=(c.querySelector('.trek-tag')||{textContent:''}).textContent.toLowerCase(), f=(CATS[slug]||'');
+    ['himachal','uttarakhand','rajasthan','kashmir'].forEach(function(r){if(tag.indexOf(r)>-1) f+=' '+r;});
+    var m=tag.match(/(\d+)\s*d\s*\/\s*(\d+)\s*n/), n=null, m2=tag.match(/(\d+)\s*n\s*\/\s*(\d+)\s*d/);
+    if(m) n=parseInt(m[2],10); else if(m2) n=parseInt(m2[1],10);
+    if(n!==null && n<=2) f+=' weekend';
+    c.setAttribute('data-f',f);
+  });
+  var active='all';
+  window.ttiSync=function(){
+    var any=false;
+    cards.forEach(function(c){
+      var ok=active==='all'||(' '+c.getAttribute('data-f')+' ').indexOf(' '+active+' ')>-1;
+      c.classList.toggle('f-hide',!ok);
+    });
+    [].slice.call(root.querySelectorAll('.trek-group')).forEach(function(g){
+      var vis=[].slice.call(g.querySelectorAll('.trek-card')).some(function(c){return !c.classList.contains('f-hide')&&c.style.display!=='none';});
+      g.hidden=!vis; if(vis) any=true;
+    });
+    var st=document.getElementById('searchStatus');
+    document.getElementById('trekEmpty').hidden=any||(st&&!st.hidden);
+  };
+  chips.forEach(function(b){b.addEventListener('click',function(){
+    active=b.getAttribute('data-f'); chips.forEach(function(x){x.classList.toggle('on',x===b);}); window.ttiSync();
+  });});
+  /* Notify me */
+  var back=document.createElement('div'); back.className='nm-back'; back.hidden=true;
+  back.innerHTML='<div class="nm-box" role="dialog" aria-modal="true" aria-labelledby="nmT"><button type="button" class="nm-x" aria-label="Close">&times;</button><h4 id="nmT"></h4><p>Leave your email and we will write to you the day bookings open. No spam.</p><form novalidate><input class="hp" name="website" tabindex="-1" autocomplete="off"><input type="email" name="email" placeholder="Your email" aria-label="Email address" required><button type="submit">Notify me</button></form><div class="nm-msg" role="status"></div></div>';
+  document.body.appendChild(back);
+  var form=back.querySelector('form'), msg=back.querySelector('.nm-msg'), title=back.querySelector('h4'), btn=form.querySelector('button[type=submit]'), slug='';
+  function close(){back.hidden=true;}
+  function open(c){
+    slug=c.getAttribute('href').split('/')[0]; title.textContent='Notify me when '+(c.querySelector('.trek-title')||{textContent:'this trip'}).textContent.trim()+' opens';
+    msg.textContent=''; form.reset(); back.hidden=false; form.email.focus();
+  }
+  root.addEventListener('click',function(e){var b=e.target.closest('.notify-btn'); if(!b) return; e.preventDefault(); open(b.closest('.trek-card'));});
+  root.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('notify-btn')){e.preventDefault(); open(e.target.closest('.trek-card'));}});
+  back.addEventListener('click',function(e){if(e.target===back||e.target.classList.contains('nm-x')) close();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!back.hidden) close();});
+  form.addEventListener('submit',function(e){
+    e.preventDefault(); var email=form.email.value.trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){msg.style.color='#B42318';msg.textContent='Please enter a valid email.';return;}
+    btn.disabled=true;
+    fetch('/.netlify/functions/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,website:form.website.value,source:('notify:'+slug).slice(0,40)})})
+     .then(function(r){return r.json().then(function(d){return{ok:r.ok,d:d};});})
+     .then(function(x){if(!x.ok) throw new Error(x.d.error); msg.style.color='#1E8E5A'; msg.textContent="Done! We'll email you when it opens."; form.reset(); setTimeout(close,2200);})
+     .catch(function(err){msg.style.color='#B42318'; msg.textContent=err.message||'Could not save your email. Try again.';})
+     .then(function(){btn.disabled=false;});
+  });
+})();
+</script>
 <script src="/assets/newsletter.js" defer></script>
 </body>
 </html>

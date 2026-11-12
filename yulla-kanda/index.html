@@ -657,8 +657,8 @@
             <input type="number" id="f_count" min="1" max="20" value="1">
           </div>
         </div>
-        <div class="field">
-          <label for="f_date">Preferred departure date</label>
+        <div class="field" id="dateField" data-departure="friday">
+          <label for="f_date">Departure date</label>
           <input type="date" id="f_date">
         </div>
 
@@ -838,6 +838,7 @@
     var phone = document.getElementById('f_phone').value.trim();
     var email = document.getElementById('f_email').value.trim();
     var date = document.getElementById('f_date').value;
+    if(!date){ toast('Please choose your departure date.'); document.getElementById('f_date').focus(); return; }
 
     btn.disabled = true; btn.textContent = 'Starting secure payment…';
     var order;
@@ -902,6 +903,7 @@
     document.querySelectorAll('.book-btn').forEach(function(b){b.disabled=true;b.textContent='Closed · Opens April 2027';b.style.opacity='.6';b.style.cursor='not-allowed';});
   })();
 </script>
+<script src="/assets/departures.js" defer></script>
 <script src="/assets/reviews.js" defer></script>
 <script src="/assets/newsletter.js" defer></script>
 </body>
