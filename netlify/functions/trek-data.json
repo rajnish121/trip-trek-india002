@@ -57,6 +57,14 @@
   "udaipur-mount-abu": {
    "quad": 6999,
    "double": 7999
+  },
+  "kedarkantha": {
+   "quad": 5999,
+   "double": 6999
+  },
+  "jaisalmer": {
+   "quad": 8999,
+   "double": 9999
   }
  },
  "names": {
@@ -71,7 +79,9 @@
   "mcleodganj-triund": "McLeodganj – Triund Trek",
   "rudranath": "Rudranath Trek — Panch Kedar Pilgrimage",
   "yulla-kanda": "Yulla Kanda Trek — World's Highest Krishna Temple",
-  "udaipur-mount-abu": "Udaipur with Mount Abu Trip"
+  "udaipur-mount-abu": "Udaipur with Mount Abu Trip",
+  "kedarkantha": "Kedarkantha Trek — Sankri, Uttarakhand",
+  "jaisalmer": "Jaisalmer Trip — Kuldhara & Longewala"
  },
  "closed": {
   "yulla-kanda": "Opens April 2027",
