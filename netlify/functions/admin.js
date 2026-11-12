@@ -38,6 +38,21 @@ exports.handler = async (event) => {
       const r = await sb('bookings?id=eq.' + id, { method: 'PATCH', body: patch });
       return json(200, { booking: r && r[0] });
     }
+    if (p.action === 'reviews') {
+      const rows = await sb('reviews?select=*&order=created_at.desc&limit=500');
+      return json(200, { reviews: rows || [], trips: DATA.names });
+    }
+    if (p.action === 'review_set') {
+      const id = encodeURIComponent(p.id || '');
+      if (!id) return json(400, { error: 'Missing id' });
+      if (p.status === 'delete') { await sb('reviews?id=eq.' + id, { method: 'DELETE', prefer: 'return=minimal' }); return json(200, { ok: true }); }
+      if (!['approved', 'rejected', 'pending'].includes(p.status)) return json(400, { error: 'Bad status' });
+      const patch = { status: p.status, approved_at: p.status === 'approved' ? new Date().toISOString() : null };
+      if (typeof p.display_name === 'string' && p.display_name.trim().length >= 2) patch.display_name = p.display_name.trim().slice(0, 40);
+      if (typeof p.body === 'string' && p.body.trim().length >= 10) patch.body = p.body.trim().slice(0, 1000);
+      const r = await sb('reviews?id=eq.' + id, { method: 'PATCH', body: patch });
+      return json(200, { review: r && r[0] });
+    }
     if (p.action === 'links') {
       const rows = await sb('payment_links?select=*&order=created_at.desc&limit=200');
       return json(200, { links: rows });
