@@ -35,7 +35,7 @@
    '.tti-txt .sub u.in{color:#FFD2B8;}'+
    '.tti-skip{position:absolute;right:16px;bottom:14px;font-size:12px;font-weight:600;letter-spacing:.08em;opacity:.7;pointer-events:none;}'+
    '@media(max-width:520px){.tti-bubble{font-size:12px;padding:8px 11px;}.tti-plane{width:70px;}.tti-bubble:before{left:52px;}}'+
-   '@media(prefers-reduced-motion:reduce){.tti-plane{animation:none;}.tti-plane:before{animation:none;}}';
+   '@media(prefers-reduced-motion:reduce){.tti-plane{animation-duration:6s;}}';
   document.head.appendChild(css);
 
   a.classList.add('tti-perch');
@@ -77,7 +77,7 @@
     if(e){e.preventDefault();e.stopPropagation();}
     if(busy) return; busy=true;
     try{sessionStorage.setItem('ttiFly','1');}catch(x){}
-    if(reduce){ location.href=DEST; return; }
+    /* phones with 'Reduce Motion' on still get the flight, in a calm version: slower clouds, no streaks, no shake */
     bub.classList.remove('show');
     var pf=document.createElement('link'); pf.rel='prefetch'; pf.href=DEST; document.head.appendChild(pf);
 
@@ -122,7 +122,7 @@
       if(done) return;
       var t=now-t0, dt=Math.min(.05,(now-last)/1000); last=now;
       var ph=planePose(t);
-      var speed=1+ease((t-600)/2200)*1.6+ph.q*2;     // clouds accelerate as the plane gains speed
+      var speed=(1+ease((t-600)/2200)*1.6+ph.q*2)*(reduce?.4:1);     // clouds accelerate as the plane gains speed
       var fade=ease(t/650);                            // sky fades in over the page
       g.clearRect(0,0,W,H);
       // sky + sunrise
@@ -156,7 +156,7 @@
         g.beginPath(); g.moveTo(A.x,A.y); g.lineTo(B.x,B.y); g.stroke(); }
       // the plane
       if(img.complete&&img.naturalWidth){
-        var h=ph.w*190/600, shake=ph.p>.9&&ph.q<.1?Math.sin(t/37)*1.2:0;
+        var h=ph.w*190/600, shake=(!reduce&&ph.p>.9&&ph.q<.1)?Math.sin(t/37)*1.2:0;
         g.save(); g.globalAlpha=1; g.translate(ph.x+shake,ph.y); g.rotate(ph.rot);
         // glow + shadow
         g.shadowColor='rgba(255,170,100,.55)'; g.shadowBlur=ph.w*.08; g.shadowOffsetY=ph.w*.015;
@@ -166,7 +166,7 @@
       drawLayer(layers[2]);
       // near clouds + speed streaks give the sense of speed
       g.globalAlpha=1;
-      for(var i=0;i<streaks.length;i++){ var s=streaks[i]; s.x-=s.v*speed*dt; if(s.x<-s.l){ s.x=W+rnd(t+i)*400; s.y=rnd(t*.7+i)*H; }
+      for(var i=0;i<(reduce?0:streaks.length);i++){ var s=streaks[i]; s.x-=s.v*speed*dt; if(s.x<-s.l){ s.x=W+rnd(t+i)*400; s.y=rnd(t*.7+i)*H; }
         g.strokeStyle='rgba(255,255,255,'+(.08+.16*Math.min(1,(speed-1)/2))*fade+')'; g.lineWidth=1.4; g.beginPath(); g.moveTo(s.x,s.y); g.lineTo(s.x+s.l*(.5+speed*.25),s.y); g.stroke(); }
       drawLayer(layers[3]);
       // lens flare
