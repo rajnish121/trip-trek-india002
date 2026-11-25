@@ -17,7 +17,7 @@ const json = (status, body) => ({
 });
 
 
-// ---- Departure dates: every trip departs on a Friday, except the trips listed in DATA.anyday ----
+// ---- Departure dates: every trip departs on a Friday (or the day set in DATA.weekday), except the trips listed in DATA.anyday ----
 const MIN_LEAD_DAYS = 2;
 const todayIST = () => new Date(Date.now() + 5.5 * 3600 * 1000).toISOString().slice(0, 10);
 function departureError(trek, date) {
@@ -26,7 +26,10 @@ function departureError(trek, date) {
   if (isNaN(d) || d.toISOString().slice(0, 10) !== date) return 'Please choose a valid departure date.';
   const min = new Date(todayIST() + 'T00:00:00Z'); min.setUTCDate(min.getUTCDate() + MIN_LEAD_DAYS);
   if (d < min) return 'Please choose a date at least ' + MIN_LEAD_DAYS + ' days from today.';
-  if (!(DATA.anyday || []).includes(trek) && d.getUTCDay() !== 5) return 'This trip departs on Fridays only. Please choose a Friday.';
+  if (!(DATA.anyday || []).includes(trek)) {
+    const want = (DATA.weekday || {})[trek] || 5; // default Friday; trek-data.json "weekday" lists trips on another day (6 = Saturday)
+    if (d.getUTCDay() !== want) { const nm = want === 6 ? 'Saturday' : 'Friday'; return 'This trip departs on ' + nm + 's only. Please choose a ' + nm + '.'; }
+  }
   return null;
 }
 
