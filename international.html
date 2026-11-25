@@ -141,9 +141,10 @@ footer{background:var(--navy-deep);color:#9FB6DE;padding:56px 0 26px;}
 @keyframes ttiDrift{from{transform:translateX(-260px);}to{transform:translateX(calc(100vw + 260px));}}
 .intl-hero .jet{position:absolute;z-index:1;width:min(420px,60vw);top:52%;left:0;opacity:.95;filter:drop-shadow(0 12px 14px rgba(2,20,60,.4));animation:ttiJet 14s linear infinite;}
 @keyframes ttiJet{0%{transform:translate(-110%,40px) rotate(-3deg);}50%{transform:translate(50vw,-30px) rotate(-8deg);}100%{transform:translate(110vw,-120px) rotate(-12deg);}}
-@media(prefers-reduced-motion:reduce){.intl-hero .cl,.intl-hero .jet{animation:none;}}
+@media(prefers-reduced-motion:reduce){.intl-hero .cl{animation-duration:90s!important;}.intl-hero .jet{animation-duration:26s;}}
+@media(max-width:600px){.intl-hero .jet{top:74%;width:70vw;}.intl-hero{padding-bottom:150px;}}
 </style>
-<style>.tti-arrive body::before{content:"";position:fixed;inset:0;z-index:99999;background:#eef5ff;pointer-events:none;animation:ttiArrive .9s .1s ease forwards}@keyframes ttiArrive{to{opacity:0;visibility:hidden}}@media(prefers-reduced-motion:reduce){.tti-arrive body::before{display:none}}</style>
+<style>.tti-arrive body::before{content:"";position:fixed;inset:0;z-index:99999;background:#eef5ff;pointer-events:none;animation:ttiArrive .9s .1s ease forwards}@keyframes ttiArrive{to{opacity:0;visibility:hidden}}</style>
 <script>try{if(sessionStorage.getItem('ttiFly')){sessionStorage.removeItem('ttiFly');document.documentElement.classList.add('tti-arrive');}}catch(e){}</script>
 <!--seo-->
 <link rel="canonical" href="https://triptrekindia.in/international.html">
