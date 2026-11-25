@@ -133,8 +133,17 @@ footer{background:var(--navy-deep);color:#9FB6DE;padding:56px 0 26px;}
 .corp-step b{flex:none;width:30px;height:30px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;}
 .corp-step span{font-size:15px;line-height:1.6;color:var(--ink);padding-top:3px;}
 @media(max-width:760px){.corp-grid{grid-template-columns:1fr;}.corp-form .row{grid-template-columns:1fr;}.corp-form{padding:20px;}}
+.intl-hero{position:relative;overflow:hidden;background:linear-gradient(180deg,#071d4d 0%,#1f5cb8 48%,#f08a6a 82%,#ffc58a 100%)!important;padding-bottom:110px;}
+.intl-hero .wrap{position:relative;z-index:2;}
+.intl-hero .cl{position:absolute;z-index:1;height:46px;width:190px;border-radius:50px;background:rgba(255,255,255,.82);filter:blur(1.5px);animation:ttiDrift linear infinite;}
+.intl-hero .cl:before,.intl-hero .cl:after{content:"";position:absolute;background:inherit;border-radius:50%;}
+.intl-hero .cl:before{width:80px;height:80px;left:30px;top:-34px;}.intl-hero .cl:after{width:60px;height:60px;left:92px;top:-22px;}
+@keyframes ttiDrift{from{transform:translateX(-260px);}to{transform:translateX(calc(100vw + 260px));}}
+.intl-hero .jet{position:absolute;z-index:1;width:min(420px,60vw);top:52%;left:0;opacity:.95;filter:drop-shadow(0 12px 14px rgba(2,20,60,.4));animation:ttiJet 14s linear infinite;}
+@keyframes ttiJet{0%{transform:translate(-110%,40px) rotate(-3deg);}50%{transform:translate(50vw,-30px) rotate(-8deg);}100%{transform:translate(110vw,-120px) rotate(-12deg);}}
+@media(prefers-reduced-motion:reduce){.intl-hero .cl,.intl-hero .jet{animation:none;}}
 </style>
-<style>.tti-arrive body::before{content:"";position:fixed;inset:0;z-index:99999;background:radial-gradient(circle at 50% 40%,#0a4fa8,#022D68 70%);pointer-events:none;animation:ttiArrive .8s .15s ease forwards}@keyframes ttiArrive{to{opacity:0;visibility:hidden}}@media(prefers-reduced-motion:reduce){.tti-arrive body::before{display:none}}</style>
+<style>.tti-arrive body::before{content:"";position:fixed;inset:0;z-index:99999;background:#eef5ff;pointer-events:none;animation:ttiArrive .9s .1s ease forwards}@keyframes ttiArrive{to{opacity:0;visibility:hidden}}@media(prefers-reduced-motion:reduce){.tti-arrive body::before{display:none}}</style>
 <script>try{if(sessionStorage.getItem('ttiFly')){sessionStorage.removeItem('ttiFly');document.documentElement.classList.add('tti-arrive');}}catch(e){}</script>
 <!--seo-->
 <link rel="canonical" href="https://triptrekindia.in/international.html">
@@ -179,6 +188,8 @@ footer{background:var(--navy-deep);color:#9FB6DE;padding:56px 0 26px;}
 </nav>
 
 <section class="page-hero intl-hero">
+  <span class="cl" style="top:16%;animation-duration:38s"></span><span class="cl" style="top:62%;width:240px;animation-duration:52s;animation-delay:-20s;opacity:.7"></span><span class="cl" style="top:34%;width:150px;animation-duration:30s;animation-delay:-9s;opacity:.6"></span>
+  <img class="jet" src="/assets/plane.svg" alt="" width="600" height="190">
   <div class="wrap">
     <span class="tag">COMING SOON</span>
     <h1>Trip Trek <span style="color:var(--orange)">International</span></h1>
