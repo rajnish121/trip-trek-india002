@@ -303,8 +303,8 @@
     .wrap{padding:0 20px;}
   }
   @media(min-width:861px){.price-grid{grid-template-columns:repeat(2,1fr);max-width:820px;margin-left:auto;margin-right:auto;}}
-  .closed-bar{background:#13243C;color:#fff;text-align:center;padding:12px 16px;font-size:14px;font-weight:600;}
-  .closed-bar b{color:#FFB199;}
+  .notice-bar{background:#FFF3CD;color:#5A3E00;text-align:center;padding:12px 16px;font-size:14px;font-weight:600;border-bottom:2px solid #F5B301;}
+  .notice-bar b{color:#B42318;}
   .side-panel .side-item{display:none;}
   .closed-note{text-align:center;padding:18px 6px;}
   .closed-note .big{font-size:40px;}
@@ -324,7 +324,7 @@
 <meta name="twitter:title" content="Spiti Valley Full Circuit from Delhi — 7D/6N Kinnaur, Kaza &amp;amp; Chandratal | Trip Trek India">
 <meta name="twitter:description" content="7 Days / 6 Nights Spiti Valley full circuit from Delhi via Shimla, Kalpa, Chitkul, Nako, Kaza and Chandratal, returning via Manali. Stays, 6 breakfasts and 6 dinners, permits and transport included. Departs every Saturday.">
 <meta name="twitter:image" content="https://triptrekindia.in/assets/og-image.jpg">
-<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://triptrekindia.in/"}, {"@type": "ListItem", "position": 2, "name": "Trips", "item": "https://triptrekindia.in/#treks"}, {"@type": "ListItem", "position": 3, "name": "Spiti Valley Full Circuit — Kinnaur, Kaza & Chandratal", "item": "https://triptrekindia.in/spiti-valley/"}]}, {"@type": "TouristTrip", "name": "Spiti Valley Full Circuit — Kinnaur, Kaza & Chandratal", "description": "7 Days / 6 Nights Spiti Valley full circuit from Delhi via Shimla, Kalpa, Chitkul, Nako, Kaza and Chandratal, returning via Manali. Stays, 6 breakfasts and 6 dinners, permits and transport included. Departs every Saturday.", "url": "https://triptrekindia.in/spiti-valley/", "image": "https://triptrekindia.in/assets/og-image.jpg", "provider": {"@id": "https://triptrekindia.in/#org"}, "offers": [{"@type": "Offer", "name": "Quad sharing", "price": "18000", "priceCurrency": "INR", "url": "https://triptrekindia.in/spiti-valley/", "availability": "https://schema.org/PreOrder"}, {"@type": "Offer", "name": "Double sharing", "price": "20000", "priceCurrency": "INR", "url": "https://triptrekindia.in/spiti-valley/", "availability": "https://schema.org/PreOrder"}]}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://triptrekindia.in/"}, {"@type": "ListItem", "position": 2, "name": "Trips", "item": "https://triptrekindia.in/#treks"}, {"@type": "ListItem", "position": 3, "name": "Spiti Valley Full Circuit — Kinnaur & Kaza", "item": "https://triptrekindia.in/spiti-valley/"}]}, {"@type": "TouristTrip", "name": "Spiti Valley Full Circuit — Kinnaur & Kaza", "description": "7 Days / 6 Nights Spiti Valley full circuit from Delhi via Shimla, Kalpa, Chitkul, Nako, Kaza and Chandratal, returning via Manali. Stays, 6 breakfasts and 6 dinners, permits and transport included. Departs every Saturday.", "url": "https://triptrekindia.in/spiti-valley/", "image": "https://triptrekindia.in/assets/og-image.jpg", "provider": {"@id": "https://triptrekindia.in/#org"}, "offers": [{"@type": "Offer", "name": "Quad sharing", "price": "18000", "priceCurrency": "INR", "url": "https://triptrekindia.in/spiti-valley/", "availability": "https://schema.org/InStock"}, {"@type": "Offer", "name": "Double sharing", "price": "20000", "priceCurrency": "INR", "url": "https://triptrekindia.in/spiti-valley/", "availability": "https://schema.org/InStock"}]}]}</script>
 <!--/seo-->
 </head>
 <body>
@@ -353,7 +353,7 @@
     <a href="#booking">Book Now</a>
   </div>
 </nav>
-<div class="closed-bar">Bookings closed for now — <b>Opens June 2027</b> (the Chandratal and Kunzum Pass road is closed in winter). Departures every Saturday. Message us on WhatsApp to be notified when seats open.</div>
+<div class="notice-bar"><b>Important notice:</b> Chandratal Lake is excluded from this itinerary for now, because the Kunzum Pass–Chandratal road is closed for the season. The rest of the Spiti circuit runs as planned. Departures every Saturday.</div>
 
 <section class="hero" id="hero">
   <div class="wrap hero-inner">
@@ -1006,14 +1006,6 @@
   });
 </script>
 
-<script>
-  // Trip closed: replace booking form, disable booking buttons
-  (function(){
-    var card=document.querySelector('.form-card');
-    if(card) card.innerHTML='<div class="closed-note"><div class="big">🏔️</div><h3>Bookings closed for now</h3><p>Opens June 2027, with departures every Saturday. Leave us a message and we will tell you the moment seats open.</p><a class="btn btn-primary" href="https://wa.me/919310965771?text=Hi%20Trip%20Trek%20India%21%20Please%20notify%20me%20when%20Spiti%20Valley%20Full%20Circuit%20opens%20%28Opens%20June%202027%29." target="_blank" rel="noopener">Notify me on WhatsApp</a></div>';
-    document.querySelectorAll('.book-btn').forEach(function(b){b.disabled=true;b.textContent='Closed · Opens June 2027';b.style.opacity='.6';b.style.cursor='not-allowed';});
-  })();
-</script>
 <script src="/assets/departures.js" defer></script>
 <script src="/assets/reviews.js" defer></script>
 <script src="/assets/newsletter.js" defer></script>
