@@ -85,6 +85,10 @@
     "darma-valley": {
       "quad": 14999,
       "double": 16999
+    },
+    "spiti-valley": {
+      "quad": 18000,
+      "double": 20000
     }
   },
   "names": {
@@ -106,18 +110,23 @@
     "harsil-valley": "Harsil Valley Trip — Gartang Gali & Gangotri",
     "munsiyari-khaliya-top": "Munsiyari Khaliya Top Trip — Kasar Devi & Kumaon",
     "kashmir-tour-5d4n": "Kashmir Tour — Srinagar, Gulmarg, Sonmarg & Pahalgam",
-    "darma-valley": "Darma Valley Trip — Panchachuli Base Camp & Nepal Border"
+    "darma-valley": "Darma Valley Trip — Panchachuli Base Camp & Nepal Border",
+    "spiti-valley": "Spiti Valley Full Circuit — Kinnaur, Kaza & Chandratal"
   },
   "closed": {
     "yulla-kanda": "Opens April 2027",
     "madhyamaheshwar": "Opens 2027",
     "kedarnath-yatra": "Opens 2027",
-    "rudranath": "Opens 2027"
+    "rudranath": "Opens 2027",
+    "spiti-valley": "Opens June 2027"
   },
   "anyday": [
     "chopta-tungnath-chandrashila",
     "manali-kasol",
     "manali-kasol-4d3n",
     "kedarkantha"
-  ]
+  ],
+  "weekday": {
+    "spiti-valley": 6
+  }
 }
