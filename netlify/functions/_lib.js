@@ -33,6 +33,12 @@ function departureError(trek, date) {
   return null;
 }
 
+// ---- Peak-season surcharge: per person, for departures between DATA.peak.from and DATA.peak.to (inclusive) ----
+function peakAdd(date) {
+  const pk = DATA.peak;
+  return pk && date >= pk.from && date <= pk.to ? pk.add : 0;
+}
+
 // ---- Supabase (REST, service role: server only) ----
 async function sb(path, { method = 'GET', body, prefer } = {}) {
   const url = env('SUPABASE_URL').replace(/\/$/, '') + '/rest/v1/' + path;
@@ -269,5 +275,5 @@ async function confirmBooking(orderId, paymentId) {
 module.exports = {
   DATA, ADVANCE_PER_PERSON, env, json, sb, rzCreateOrder, verifyCheckoutSignature,
   timingSafeEqualHex, confirmBooking, sendConfirmationEmail, crypto,
-  sendMail, wrapMail, esc, inr, teamList, getUser, requireAdmin, confirmBalance, departureError, MIN_LEAD_DAYS,
+  sendMail, wrapMail, esc, inr, teamList, getUser, requireAdmin, confirmBalance, departureError, peakAdd, MIN_LEAD_DAYS,
 };
