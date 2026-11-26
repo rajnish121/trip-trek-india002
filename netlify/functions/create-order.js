@@ -1,4 +1,4 @@
-const { DATA, ADVANCE_PER_PERSON, env, json, sb, rzCreateOrder, departureError } = require('./_lib');
+const { DATA, ADVANCE_PER_PERSON, env, json, sb, rzCreateOrder, departureError, peakAdd } = require('./_lib');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'POST only' });
@@ -25,7 +25,7 @@ exports.handler = async (event) => {
     if (dateErr) return json(400, { error: dateErr });
 
     // All amounts are computed here, never trusted from the browser.
-    const total = pricePer * travellers;
+    const total = (pricePer + peakAdd(travelDate)) * travellers;
     const advance = ADVANCE_PER_PERSON * travellers;
     const balance = total - advance;
 
